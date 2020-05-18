@@ -1,0 +1,7 @@
+package exlcm;
+
+struct Example
+{
+    int8_t a;
+    double b;
+}
