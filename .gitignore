@@ -34,3 +34,10 @@
 
 # output files folder
 out/
+
+# cmake cache files
+CMakeFiles/
+cmake_install.cmake
+CMakeCache.txt
+
+!./Makefile
