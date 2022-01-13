@@ -17,15 +17,6 @@
 #include <unistd.h>
 
 /*---------------------------------------------------------------------------*/
-// Type define
-
-struct IP_MREQ
-{
-    struct in_addr imr_multiaddr; //多播组的IP地址
-    struct in_addr imr_interface; //加入的客服端主机IP地址
-};
-
-/*---------------------------------------------------------------------------*/
 // Namespace
 namespace sockettest
 {
@@ -154,7 +145,7 @@ bool SocketUdpReceiver::connectSocket()
     }
 
     // Add into multicast
-    IP_MREQ mreq;
+    ip_mreq mreq;
     mreq.imr_multiaddr.s_addr = inet_addr(UDP_MULTICAST_IP);
     mreq.imr_interface.s_addr = INADDR_ANY;
     setsockopt(m_iServerFd, IPPROTO_IP, IP_ADD_MEMBERSHIP, (const char*)&mreq, sizeof(mreq));

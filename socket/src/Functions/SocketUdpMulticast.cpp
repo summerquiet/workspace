@@ -37,7 +37,7 @@ SocketUdpMulticast::SocketUdpMulticast()
 , m_pMulticastAddr(nullptr)
 , m_th(0)
 {
-    m_pMulticastAddr = new struct sockaddr_in();
+    m_pMulticastAddr = new sockaddr_in();
     memset(m_pMulticastAddr, 0, sizeof(sockaddr_in));
 }
 
@@ -92,7 +92,7 @@ bool SocketUdpMulticast::send(const char* msg, int len)
     }
 
     // Send data
-    int ret = ::sendto(m_iServerFd, msg, len, 0, (sockaddr*)m_pMulticastAddr, sizeof(struct sockaddr_in));
+    int ret = ::sendto(m_iServerFd, msg, len, 0, (sockaddr*)m_pMulticastAddr, sizeof(sockaddr_in));
     if (ret == -1) {
         printf("%s:%d send message error\n", __func__, __LINE__);
         return false;
