@@ -20,7 +20,15 @@
 
 ### /Functions
 
-是各种模块
+#### TCP
+
+SocketTcpServer & SocketTcpClient  
+这是2使用TCP连接的多客户端实例代码
+
+#### UDP
+
+SocketUdpMulticast & SocketUdpReceiver  
+这是2个使用UDP广播方法进行收发数据的实例代码
 
 ### main.cpp
 

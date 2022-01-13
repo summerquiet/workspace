@@ -3,8 +3,8 @@
  * Copyright ~
  */
 
- #ifndef CXX_SOCKET_CLIENT_H
- #define CXX_SOCKET_CLIENT_H
+ #ifndef CXX_SOCKET_TCP_SERVER_H
+ #define CXX_SOCKET_TCP_SERVER_H
 
 /*---------------------------------------------------------------------------*/
 // Include files
@@ -21,38 +21,38 @@ namespace sockettest
 // Class define
 
 /**
- * @class SocketClient
+ * @class SocketTcpServer
  * 
- * @brief Handle socket client class
+ * @brief Handle socket server class
  * 
  */
-class SocketClient : public SocketBase
+class SocketTcpServer : public SocketBase
 {
 public:
     /**
      * @brief Construct a new Socket Server object
      */
-    SocketClient();
+    SocketTcpServer();
 
     /**
      * @brief Destroy the Socket Server object
      */
-    virtual ~SocketClient();
+    virtual ~SocketTcpServer();
 
     /**
-     * @brief init
+     * @brief Init
      * 
      */
     virtual void init(const SocketReceiveMsgCallback& cb);
 
     /**
-     * @brief init
+     * @brief Start
      * 
      */
     virtual bool start();
 
     /**
-     * @brief init
+     * @brief Stop
      * 
      */
     virtual bool stop();
@@ -80,28 +80,30 @@ public:
 private:
 
     /**
-     * @brief init
+     * @brief Run
      * 
      */
     static void* run(void* arg);
 
     /**
-     * @brief Start connect socket
+     * @brief Start socket server
      * 
      */
-    bool connectSocket();
+    bool startServer();
 
 private:
+
     // Members
-    enum ClientStatus
+    enum ServerStatus
     {
-        E_CLIENT_STATUS_NONE = 0,
-        E_CLIENT_STATUS_CONNECTING,
-        E_CLIENT_STATUS_CONNECTED,
+        E_SERVER_STATUS_NONE = 0,
+        E_SERVER_STATUS_STARTING,
+        E_SERVER_STATUS_READY,
     };
 
-    ClientStatus        m_eStatus;
+    ServerStatus        m_eStatus;
     int                 m_iServerFd;
+    int                 m_iClientFdList[8];
 
     pthread_t           m_th;
 
@@ -109,12 +111,12 @@ private:
     /**
      * @brief Copy constructor(Forbidden)
      */
-    SocketClient(const SocketClient&);
+    SocketTcpServer(const SocketTcpServer&);
 
     /**
      * @brief Operator =(Forbidden)
      */
-    SocketClient& operator =(const SocketClient&);
+    SocketTcpServer& operator =(const SocketTcpServer&);
 
 };
 
@@ -123,5 +125,5 @@ private:
 }
 
 /*---------------------------------------------------------------------------*/
- #endif // CXX_SOCKET_CLIENT_H
- /*EOF*/
+#endif // CXX_SOCKET_TCP_SERVER_H
+/*EOF*/

@@ -33,5 +33,5 @@ public:
 };
 
 /*---------------------------------------------------------------------------*/
- #endif // CXX_SAMPLE_ALGORITHM_H
- /*EOF*/
+#endif // CXX_SAMPLE_ALGORITHM_H
+/*EOF*/

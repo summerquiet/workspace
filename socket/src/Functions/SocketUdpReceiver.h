@@ -3,14 +3,19 @@
  * Copyright ~
  */
 
- #ifndef CXX_SOCKET_SERVER_H
- #define CXX_SOCKET_SERVER_H
+ #ifndef CXX_SOCKET_UDP_RECEIVER_H
+ #define CXX_SOCKET_UDP_RECEIVER_H
 
 /*---------------------------------------------------------------------------*/
 // Include files
 
 #include "SocketBase.h"
 #include <pthread.h>
+
+/*---------------------------------------------------------------------------*/
+// Class define
+
+struct sockaddr_in;
 
 /*---------------------------------------------------------------------------*/
 // Namespace
@@ -21,38 +26,38 @@ namespace sockettest
 // Class define
 
 /**
- * @class SocketServer
+ * @class SocketUdpReceiver
  * 
- * @brief Handle socket server class
+ * @brief Handle socket client class
  * 
  */
-class SocketServer : public SocketBase
+class SocketUdpReceiver : public SocketBase
 {
 public:
     /**
      * @brief Construct a new Socket Server object
      */
-    SocketServer();
+    SocketUdpReceiver();
 
     /**
      * @brief Destroy the Socket Server object
      */
-    virtual ~SocketServer();
+    virtual ~SocketUdpReceiver();
 
     /**
-     * @brief Init
+     * @brief init
      * 
      */
     virtual void init(const SocketReceiveMsgCallback& cb);
 
     /**
-     * @brief Start
+     * @brief init
      * 
      */
     virtual bool start();
 
     /**
-     * @brief Stop
+     * @brief init
      * 
      */
     virtual bool stop();
@@ -80,30 +85,20 @@ public:
 private:
 
     /**
-     * @brief Run
+     * @brief init
      * 
      */
     static void* run(void* arg);
 
     /**
-     * @brief Start socket server
+     * @brief Start connect socket
      * 
      */
-    bool startServer();
+    bool connectSocket();
 
 private:
-
     // Members
-    enum ServerStatus
-    {
-        E_SERVER_STATUS_NONE = 0,
-        E_SERVER_STATUS_STARTING,
-        E_SERVER_STATUS_READY,
-    };
-
-    ServerStatus        m_eStatus;
     int                 m_iServerFd;
-    int                 m_iClientFdList[8];
 
     pthread_t           m_th;
 
@@ -111,12 +106,12 @@ private:
     /**
      * @brief Copy constructor(Forbidden)
      */
-    SocketServer(const SocketServer&);
+    SocketUdpReceiver(const SocketUdpReceiver&);
 
     /**
      * @brief Operator =(Forbidden)
      */
-    SocketServer& operator =(const SocketServer&);
+    SocketUdpReceiver& operator =(const SocketUdpReceiver&);
 
 };
 
@@ -125,5 +120,5 @@ private:
 }
 
 /*---------------------------------------------------------------------------*/
- #endif // CXX_SOCKET_SERVER_H
- /*EOF*/
+#endif // CXX_SOCKET_UDP_RECEIVER_H
+/*EOF*/

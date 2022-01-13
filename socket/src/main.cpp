@@ -9,13 +9,18 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include "SocketServer.h"
-#include "SocketClient.h"
+#include "SocketTcpServer.h"
+#include "SocketTcpClient.h"
+#include "SocketUdpMulticast.h"
+#include "SocketUdpReceiver.h"
 
 static const char s_help_message[] = "\
 input: [cammend][option]\n\
-    server: start a socket server\n\
-    client: start a socket client";
+    tcpserver: start a tcp server \n\
+    tcpclient: start a tcp client \n\
+    udpmulticast: start a UDP multicast \n\
+    udpreceiver: start a UDP receiver \n\
+    ";
 
 /*---------------------------------------------------------------------------*/
 // Callback
@@ -34,18 +39,29 @@ int main(int argc, char** argv)
 {
     bool bOutputMessage = false;
     if (argc != 2
-        || (strcmp(argv[1], "server") != 0
-        && strcmp(argv[1], "client") != 0)) {
+        || (strcmp(argv[1], "tcpserver") != 0
+        && strcmp(argv[1], "tcpclient") != 0
+        && strcmp(argv[1], "udpmulticast") != 0
+        && strcmp(argv[1], "udpreceiver") != 0)) {
         printf("%s\n", s_help_message);
         return -1;
     }
 
     sockettest::SocketBase* pSocket = nullptr;
-    if (strcmp(argv[1], "server") == 0) {
-        pSocket = new sockettest::SocketServer();
+    if (strcmp(argv[1], "tcpserver") == 0) {
+        pSocket = new sockettest::SocketTcpServer();
     }
-    else if (strcmp(argv[1], "client") == 0) {
-        pSocket = new sockettest::SocketClient();
+    else if (strcmp(argv[1], "tcpclient") == 0) {
+        pSocket = new sockettest::SocketTcpClient();
+    }
+    else if (strcmp(argv[1], "udpmulticast") == 0) {
+        pSocket = new sockettest::SocketUdpMulticast();
+    }
+    else if (strcmp(argv[1], "udpreceiver") == 0) {
+        pSocket = new sockettest::SocketUdpReceiver();
+    }
+    else {
+        return -1;
     }
 
     // Init socket

@@ -6,7 +6,7 @@
 /*---------------------------------------------------------------------------*/
 // Include files
 
-#include "SocketServer.h"
+#include "SocketTcpServer.h"
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -32,7 +32,7 @@ static bool g_bQuit = false;
 
 /*---------------------------------------------------------------------------*/
 //
-SocketServer::SocketServer()
+SocketTcpServer::SocketTcpServer()
 : m_eStatus(E_SERVER_STATUS_NONE)
 , m_iServerFd(-1)
 , m_th(0)
@@ -42,27 +42,27 @@ SocketServer::SocketServer()
 
 /*---------------------------------------------------------------------------*/
 
-SocketServer::~SocketServer()
+SocketTcpServer::~SocketTcpServer()
 {
 
 }
 
 /*---------------------------------------------------------------------------*/
 // Init
-void SocketServer::init(const SocketReceiveMsgCallback& cb)
+void SocketTcpServer::init(const SocketReceiveMsgCallback& cb)
 {
     SocketBase::init(cb);
 }
 
 /*---------------------------------------------------------------------------*/
 // Start
-bool SocketServer::start()
+bool SocketTcpServer::start()
 {
     m_eStatus = E_SERVER_STATUS_NONE;
 
     int ret = pthread_create(&m_th, NULL, run, this);
     if (ret != 0) {
-        printf("%s:%d start thread error\n", __func__, __LINE__);
+        printf("%s:%d start thread error\n", __PRETTY_FUNCTION__, __LINE__);
         return false;
     }
 
@@ -71,7 +71,7 @@ bool SocketServer::start()
 
 /*---------------------------------------------------------------------------*/
 // Stop
-bool SocketServer::stop()
+bool SocketTcpServer::stop()
 {
     g_bQuit = true;
     int* thread_ret = NULL;
@@ -83,11 +83,11 @@ bool SocketServer::stop()
 
 /*---------------------------------------------------------------------------*/
 // Send message
-bool SocketServer::send(const char* msg, int len)
+bool SocketTcpServer::send(const char* msg, int len)
 {
     // Check status
     if (m_eStatus != E_SERVER_STATUS_READY) {
-        printf("%s:%d status:%d error\n", __func__, __LINE__, m_eStatus);
+        printf("%s:%d status:%d error\n", __PRETTY_FUNCTION__, __LINE__, m_eStatus);
         return false;
     }
 
@@ -96,26 +96,26 @@ bool SocketServer::send(const char* msg, int len)
         if (m_iClientFdList[i] != 0) {
             int ret = ::send(m_iClientFdList[i], msg, len, 0);
             if (ret == -1) {
-                printf("%s:%d send message to client(%d) error\n", __func__, __LINE__, i);
+                printf("%s:%d send message to client(%d) error\n", __PRETTY_FUNCTION__, __LINE__, i);
             }
         }
     }
 
-    printf("%s:%d send message:%s\n", __func__, __LINE__, msg);
+    printf("%s:%d send message:%s\n", __PRETTY_FUNCTION__, __LINE__, msg);
     return true;
 }
 
 /*---------------------------------------------------------------------------*/
 // On receive message
-bool SocketServer::onReceive(const char* msg, int len)
+bool SocketTcpServer::onReceive(const char* msg, int len)
 {
     // Check status
     if (m_eStatus != E_SERVER_STATUS_READY) {
-        printf("%s:%d status:%d error\n", __func__, __LINE__, m_eStatus);
+        printf("%s:%d status:%d error\n", __PRETTY_FUNCTION__, __LINE__, m_eStatus);
         return false;
     }
 
-    printf("%s:%d receive message %s\n", __func__, __LINE__, msg);
+    printf("%s:%d receive message %s\n", __PRETTY_FUNCTION__, __LINE__, msg);
 
     // TODO:
 
@@ -124,9 +124,9 @@ bool SocketServer::onReceive(const char* msg, int len)
 
 /*---------------------------------------------------------------------------*/
 // Run
-void* SocketServer::run(void* arg)
+void* SocketTcpServer::run(void* arg)
 {
-    SocketServer* pThis = (SocketServer*)arg;
+    SocketTcpServer* pThis = (SocketTcpServer*)arg;
     pThis->startServer();
 
     return NULL;
@@ -134,9 +134,9 @@ void* SocketServer::run(void* arg)
 
 /*---------------------------------------------------------------------------*/
 // Start socket server
-bool SocketServer::startServer()
+bool SocketTcpServer::startServer()
 {
-    printf("%s:%d\n", __func__, __LINE__);
+    printf("%s:%d\n", __PRETTY_FUNCTION__, __LINE__);
     m_eStatus = E_SERVER_STATUS_STARTING;
 
     // Local address
@@ -149,20 +149,20 @@ bool SocketServer::startServer()
     // Create socket
     m_iServerFd = socket(AF_INET, SOCK_STREAM, 0);
     if (m_iServerFd == -1) {
-        printf("%s:%d create socket error\n", __func__, __LINE__);
+        printf("%s:%d create socket error\n", __PRETTY_FUNCTION__, __LINE__);
         return false;
     }
 
     // Bind socket
     int bind_ret = bind(m_iServerFd, (struct sockaddr *)&server_addr, sizeof(server_addr));
     if (bind_ret == -1) {
-        printf("%s:%d bind socket error\n", __func__, __LINE__);
+        printf("%s:%d bind socket error\n", __PRETTY_FUNCTION__, __LINE__);
         return false;
     }
 
     // Listen
     if (listen(m_iServerFd, BACKLOG) == -1) {
-        printf("%s:%d listen error\n", __func__, __LINE__);
+        printf("%s:%d listen error\n", __PRETTY_FUNCTION__, __LINE__);
         return false;
     }
 
@@ -205,11 +205,11 @@ bool SocketServer::startServer()
         // Select
         int ret = select(max_fd + 1, &server_fd_set, NULL, NULL, &tv);
         if (ret < 0 ) {
-            printf("%s:%d select error\n", __func__, __LINE__);
+            printf("%s:%d select error\n", __PRETTY_FUNCTION__, __LINE__);
             continue;
         }
         else if (ret == 0) {
-            printf("%s:%d select time out\n", __func__, __LINE__);
+            printf("%s:%d select time out\n", __PRETTY_FUNCTION__, __LINE__);
             continue;
         }
         else {
@@ -220,7 +220,7 @@ bool SocketServer::startServer()
                 struct sockaddr_in client_address;
                 socklen_t address_len;
                 int client_socket_fd = accept(m_iServerFd, (struct sockaddr *)&client_address, &address_len);
-                printf("%s:%d new connection client_socket_fd = %d\n", __func__, __LINE__, client_socket_fd);
+                printf("%s:%d new connection client_socket_fd = %d\n", __PRETTY_FUNCTION__, __LINE__, client_socket_fd);
                 if (client_socket_fd > 0) {
                     int insert_index = -1;
                     for (int i = 0; i < CONNECT_CURRENT_MAX; i++) {
@@ -233,7 +233,7 @@ bool SocketServer::startServer()
 
                     if (insert_index != -1) {
                         printf("%s:%d new client(%d) connected successful %s:%d\n",
-                            __func__, __LINE__,
+                            __PRETTY_FUNCTION__, __LINE__,
                             insert_index,
                             inet_ntoa(client_address.sin_addr),
                             ntohs(client_address.sin_port));
@@ -243,7 +243,7 @@ bool SocketServer::startServer()
                     char error_msg[] = "Server connection max, cannot jion!\n";
                     ::send(client_socket_fd, error_msg, strlen(error_msg), 0);
                     printf("%s:%d connection max, new client cannot join in %s:%d\n",
-                        __func__, __LINE__,
+                        __PRETTY_FUNCTION__, __LINE__,
                         inet_ntoa(client_address.sin_addr),
                         ntohs(client_address.sin_port));
                 }
@@ -261,27 +261,27 @@ bool SocketServer::startServer()
                 long byte_num = recv(m_iClientFdList[i], recv_msg, BUFFER_SIZE, 0);
                 if (byte_num > 0) {
                     if (byte_num > BUFFER_SIZE) {
-                        printf("%s:%d BUFFER_SIZE not enough for receive\n", __func__, __LINE__);
+                        printf("%s:%d BUFFER_SIZE not enough for receive\n", __PRETTY_FUNCTION__, __LINE__);
                         byte_num = BUFFER_SIZE;
                     }
 
                     if (!onReceive(recv_msg, byte_num)) {
-                        printf("%s:%d onReceive error\n", __func__, __LINE__);
+                        printf("%s:%d onReceive error\n", __PRETTY_FUNCTION__, __LINE__);
                     }
                 }
                 else if (byte_num < 0) {
-                    printf("%s:%d client %d receive message error\n", __func__, __LINE__, i);
+                    printf("%s:%d client %d receive message error\n", __PRETTY_FUNCTION__, __LINE__, i);
                 }
                 else {
                     FD_CLR(m_iClientFdList[i], &server_fd_set);
                     m_iClientFdList[i] = 0;
-                    printf("%s:%d client %d exit\n", __func__, __LINE__, i);
+                    printf("%s:%d client %d exit\n", __PRETTY_FUNCTION__, __LINE__, i);
                 }
             }
         }
     }
 
-    printf("%s:%d socket server exit\n", __func__, __LINE__);
+    printf("%s:%d socket server exit\n", __PRETTY_FUNCTION__, __LINE__);
     return true;
 }
 

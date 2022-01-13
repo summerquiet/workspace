@@ -3,13 +3,19 @@
  * Copyright ~
  */
 
- #ifndef CXX_SOCKET_BASE_H
- #define CXX_SOCKET_BASE_H
+ #ifndef CXX_SOCKET_UDP_MULTICAST_H
+ #define CXX_SOCKET_UDP_MULTICAST_H
 
 /*---------------------------------------------------------------------------*/
 // Include files
 
-#include <list>
+#include "SocketBase.h"
+#include <pthread.h>
+
+/*---------------------------------------------------------------------------*/
+// Class define
+
+struct sockaddr_in;
 
 /*---------------------------------------------------------------------------*/
 // Namespace
@@ -20,65 +26,41 @@ namespace sockettest
 // Class define
 
 /**
- * @class SocketReceiveMsgCallback
+ * @class SocketUdpMulticast
  * 
- * @brief Handle socket receive message callback class
- * 
- */
-class SocketReceiveMsgCallback
-{
-public:
-    /**
-     * @brief On receive message
-     * 
-     * @param msg 
-     * @param len 
-     */
-    virtual void onReceiveMsg(char* msg, int len) {}
-};
-
-/**
- * @class SocketBase
- * 
- * @brief Handle socket class
+ * @brief Handle socket client class
  * 
  */
-class SocketBase
+class SocketUdpMulticast : public SocketBase
 {
 public:
     /**
      * @brief Construct a new Socket Server object
      */
-    SocketBase()
-    : m_cCbList()
-    {
-    }
+    SocketUdpMulticast();
 
     /**
      * @brief Destroy the Socket Server object
      */
-    virtual ~SocketBase() {}
+    virtual ~SocketUdpMulticast();
 
     /**
      * @brief init
      * 
      */
-    virtual void init(const SocketReceiveMsgCallback& cb)
-    {
-        m_cCbList.push_back(cb);
-    };
+    virtual void init(const SocketReceiveMsgCallback& cb);
 
     /**
      * @brief init
      * 
      */
-    virtual bool start() = 0;
+    virtual bool start();
 
     /**
      * @brief init
      * 
      */
-    virtual bool stop() = 0;
+    virtual bool stop();
 
     /**
      * @brief Send message
@@ -88,7 +70,7 @@ public:
      * @return true 
      * @return false 
      */
-    virtual bool send(const char* msg, int len) = 0;
+    virtual bool send(const char* msg, int len);
 
     /**
      * @brief On receive message
@@ -98,22 +80,39 @@ public:
      * @return true 
      * @return false 
      */
-    virtual bool onReceive(const char* msg, int len) = 0;
+    virtual bool onReceive(const char* msg, int len);
 
-protected:
+private:
+
+    /**
+     * @brief init
+     * 
+     */
+    static void* run(void* arg);
+
+    /**
+     * @brief Start connect socket
+     * 
+     */
+    bool connectSocket();
+
+private:
     // Members
-    std::list<SocketReceiveMsgCallback>     m_cCbList;
+    int                 m_iServerFd;
+    sockaddr_in*        m_pMulticastAddr;
+
+    pthread_t           m_th;
 
 private:
     /**
      * @brief Copy constructor(Forbidden)
      */
-    SocketBase(const SocketBase&);
+    SocketUdpMulticast(const SocketUdpMulticast&);
 
     /**
      * @brief Operator =(Forbidden)
      */
-    SocketBase& operator =(const SocketBase&);
+    SocketUdpMulticast& operator =(const SocketUdpMulticast&);
 
 };
 
@@ -122,5 +121,5 @@ private:
 }
 
 /*---------------------------------------------------------------------------*/
-#endif // CXX_SOCKET_BASE_H
+#endif // CXX_SOCKET_UDP_MULTICAST_H
 /*EOF*/
