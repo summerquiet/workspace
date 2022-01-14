@@ -152,11 +152,15 @@ bool SocketUdpMulticast::connectSocket()
 #if 0
     sockaddr_in local_addr;
     local_addr.sin_family = AF_INET;
-    local_addr.sin_port = htons(UDP_MULTICAST_PORT);
+    local_addr.sin_port = htons(12345);
     local_addr.sin_addr.s_addr = INADDR_ANY;
-    bind(m_iServerFd, (sockaddr*)&local_addr, sizeof(sockaddr_in));
-#endif
+    int ret = bind(m_iServerFd, (sockaddr*)&local_addr, sizeof(sockaddr_in));
+        if (ret != 0) {
+        printf("%s:%d bind to port:%d error\n", __func__, __LINE__, UDP_MULTICAST_PORT);
 
+        return false;
+    }
+#endif
     while (1) {
         if (g_bQuit) {
             break;
