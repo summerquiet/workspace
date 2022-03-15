@@ -1,6 +1,6 @@
 /*******************************************************************************
 *     File Name :                        inl_matrix_common.h
-*     Create Date :                      2021/6/28
+*     Create Date :                      2022/3/11
 *     Abstract Description :             矩阵运算库公用头文件
 *******************************************************************************/
 
@@ -60,7 +60,6 @@
 #define _ERROR_NO_IMPLEMENT                                     0X10000000   //TODO
 
 
-
 /*******************************************************************************
 * (4)Struct(Data Types) Define Section
 *******************************************************************************/
@@ -112,7 +111,6 @@ Input: 无
 Output: 无
 Input_Output: 栈指针
 Return: 无
-Author: Marc Pony(marc_pony@163.com)
 ***********************************************************************************************/
 VOID init_stack(_IN_OUT STACKS* S);
 
@@ -124,9 +122,10 @@ Input: 栈指针
 Output: 无
 Input_Output: 无
 Return: 无
-Author: Marc Pony(marc_pony@163.com)
 ***********************************************************************************************/
 VOID free_stack(_IN STACKS* S);
+
+void print_matrix(MATRIX* a, STRING string);
 
 #endif  // C_INL_MATRIX_COMMON_H
 

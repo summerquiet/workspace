@@ -1,6 +1,6 @@
 /*******************************************************************************
 *     File Name :                        inl_matrix_eigen.cpp
-*     Create Date :                      2021/2/24
+*     Create Date :                      2022/3/11
 *     Abstract Description :             matrix eigen implement
 *******************************************************************************/
 
@@ -44,22 +44,6 @@
 * (8)Function Define Section
 *******************************************************************************/
 
-VOID print_matrix(MATRIX* a, STRING string)
-{
-    INDEX i, j;
-    printf("matrix %s:", string);
-    printf("\n");
-    for (i = 0; i < a->rows; i++) {
-        for (j = 0; j < a->columns; j++) {
-            printf("%f  ", a->p[i * a->columns + j]);
-        }
-        printf("\n");
-    }
-
-    printf("\n");
-}
-
-
 /**********************************************************************************************
 Function: creat_matrix
 Description: 创建矩阵
@@ -67,7 +51,6 @@ Input: 矩阵行数rows，列数columns
 Output: 错误号指针errorID，栈指针S
 Input_Output: 无
 Return: 矩阵指针
-Author: Marc Pony(marc_pony@163.com)
 ***********************************************************************************************/
 MATRIX* creat_matrix(_IN INTEGER rows, _IN INTEGER columns, _OUT ERROR_ID* errorID, _OUT STACKS* S)
 {
@@ -136,11 +119,10 @@ Input: 矩阵行数rows，列数columns，个数count
 Output: 错误号指针errorID，栈指针S
 Input_Output: 无
 Return: 矩阵指针
-Author: Marc Pony(marc_pony@163.com)
 ***********************************************************************************************/
 MATRIX* creat_multiple_matrices(_IN INTEGER rows, _IN INTEGER columns, _IN INTEGER count, _OUT ERROR_ID* errorID, _OUT STACKS* S)
 {
-    INDEX i;
+    INDEX i = 0;
     MATRIX* matrix = NULL, *p = NULL;
     MATRIX_NODE* matrixNode = NULL;
 
@@ -195,7 +177,6 @@ Input: 矩阵行数rows，列数columns
 Output: 错误号指针errorID，栈指针S
 Input_Output: 无
 Return: 矩阵指针
-Author: Marc Pony(marc_pony@163.com)
 ***********************************************************************************************/
 MATRIX* creat_zero_matrix(_IN INTEGER rows, _IN INTEGER columns, _OUT ERROR_ID* errorID, _OUT STACKS* S)
 {
@@ -227,11 +208,10 @@ Input: 矩阵行数rows，列数columns
 Output: 错误号指针errorID，栈指针S
 Input_Output: 无
 Return: 矩阵指针
-Author: Marc Pony(marc_pony@163.com)
 ***********************************************************************************************/
 MATRIX* creat_eye_matrix(_IN INTEGER n, _OUT ERROR_ID* errorID, _OUT STACKS* S)
 {
-    INDEX i;
+    INDEX i = 0;
     MATRIX* matrix = NULL;
 
     if (errorID == NULL) {
@@ -257,17 +237,43 @@ MATRIX* creat_eye_matrix(_IN INTEGER n, _OUT ERROR_ID* errorID, _OUT STACKS* S)
 
 
 /**********************************************************************************************
+Function: set_matrix_by_array
+Description: 使用array对matrix赋值
+Input: 赋值用array，赋值用array count
+Input_Output: 矩阵matrix
+Return: 错误号
+***********************************************************************************************/
+ERROR_ID set_matrix_by_array(_IN_OUT MATRIX* matrix, _IN REAL array[], _IN INDEX array_count)
+{
+    INDEX i = 0, j = 0;
+    ERROR_ID errorID = _ERROR_NO_ERROR;
+
+    if (matrix == NULL || array == NULL) {
+        return _ERROR_INPUT_PARAMETERS_ERROR;
+    }
+
+    if (array_count != matrix->rows * matrix->columns) {
+        return _ERROR_INPUT_PARAMETERS_ERROR;
+    }
+
+    // Copy data
+    memcpy(matrix->p, array, array_count * sizeof(REAL));
+
+    return errorID;
+}
+
+
+/**********************************************************************************************
 Function: matrix_add
 Description: 矩阵A + 矩阵B = 矩阵C
 Input: 矩阵A,矩阵B
 Output: 矩阵C
 Input_Output: 无
 Return: 错误号
-Author: Marc Pony(marc_pony@163.com)
 ***********************************************************************************************/
 ERROR_ID matrix_add(_IN MATRIX* A, _IN MATRIX* B, _OUT MATRIX* C)
 {
-    INDEX i, j;
+    INDEX i = 0, j = 0;
     ERROR_ID errorID = _ERROR_NO_ERROR;
 
     if (A == NULL || B == NULL || C == NULL) {
@@ -317,11 +323,10 @@ Input: 矩阵A,矩阵B
 Output: 矩阵C
 Input_Output: 无
 Return: 错误号
-Author: Marc Pony(marc_pony@163.com)
 ***********************************************************************************************/
 ERROR_ID matrix_subtraction(_IN MATRIX* A, _IN MATRIX* B, _OUT MATRIX* C)
 {
-    INDEX i, j;
+    INDEX i = 0, j = 0;
     ERROR_ID errorID = _ERROR_NO_ERROR;
 
     if (A == NULL || B == NULL || C == NULL) {
@@ -371,11 +376,10 @@ Input: 矩阵A,矩阵B
 Output: 矩阵C
 Input_Output: 无
 Return: 错误号
-Author: Marc Pony(marc_pony@163.com)
 ***********************************************************************************************/
 ERROR_ID matrix_multiplication(_IN MATRIX* A, _IN MATRIX* B, _OUT MATRIX* C)
 {
-    INDEX  i, j;
+    INDEX i = 0, j = 0;
     ERROR_ID errorID = _ERROR_NO_ERROR;
 
     if (A == NULL || B == NULL || C == NULL) {
@@ -423,11 +427,10 @@ Input: 矩阵A
 Output: 矩阵A的逆矩阵
 Input_Output: 无
 Return: 错误号
-Author: Marc Pony(marc_pony@163.com)
 ***********************************************************************************************/
 ERROR_ID matrix_inverse(_IN MATRIX* A, _OUT MATRIX* invA)
 {
-    INDEX i, j;
+    INDEX i = 0, j = 0;
     ERROR_ID errorID = _ERROR_NO_ERROR;
 
     if (A == NULL || invA == NULL) {
@@ -469,11 +472,10 @@ Input: 矩阵A
 Output: 矩阵A的转置
 Input_Output: 无
 Return: 错误号
-Author: Marc Pony(marc_pony@163.com)
 ***********************************************************************************************/
 ERROR_ID matrix_transpose(_IN MATRIX* A, _OUT MATRIX* transposeA)
 {
-    INDEX i, j;
+    INDEX i = 0, j = 0;
     ERROR_ID errorID = _ERROR_NO_ERROR;
 
     if (A == NULL || transposeA == NULL) {
@@ -515,11 +517,10 @@ Input: 矩阵A
 Output: 矩阵A的迹
 Input_Output: 无
 Return: 错误号
-Author: Marc Pony(marc_pony@163.com)
 ***********************************************************************************************/
 ERROR_ID matrix_trace(_IN MATRIX* A, _OUT REAL *trace)
 {
-    INDEX i, j;
+    INDEX i = 0, j = 0;
     ERROR_ID errorID = _ERROR_NO_ERROR;
 
     if (A == NULL || trace == NULL) {
@@ -548,20 +549,52 @@ ERROR_ID matrix_trace(_IN MATRIX* A, _OUT REAL *trace)
 
 
 /**********************************************************************************************
+Function: matrix_2_norm
+Description: 矩阵的2-范数
+Input: 矩阵A
+Output: 矩阵A的2-范数
+Input_Output: 无
+Return: 错误号
+***********************************************************************************************/
+ERROR_ID matrix_norm(_IN MATRIX* A, _OUT REAL* norm)
+{
+    INDEX i = 0, j = 0;
+    ERROR_ID errorID = _ERROR_NO_ERROR;
+
+    if (A == NULL || norm == NULL) {
+        errorID = _ERROR_INPUT_PARAMETERS_ERROR;
+        return errorID;
+    }
+
+    // Convert A to Eigen Matrix
+    Eigen::MatrixXd em_A(A->rows, A->columns);
+    for (i = 0; i < A->rows; i++) {
+        for (j = 0; j < A->columns; j++) {
+            em_A(i, j) = *(A->p + i * A->columns + j);
+        }
+    }
+
+    // Calculation
+    *norm = em_A.norm();
+
+    return errorID;
+}
+
+
+/**********************************************************************************************
 Function: lup_decomposition
 Description: n行n列矩阵LUP分解PA = L * U
 Input: n行n列矩阵A
 Output: n行n列下三角矩阵L，n行n列上三角矩阵U，n行n列置换矩阵P
 Input_Output: 无
 Return: 错误号
-Author: Marc Pony(marc_pony@163.com)
 参考：https://zhuanlan.zhihu.com/p/84210687
 ***********************************************************************************************/
 ERROR_ID lup_decomposition(_IN MATRIX* A, _OUT MATRIX* L, _OUT MATRIX* U, _OUT MATRIX* P)
 {
-    INDEX i, j, k, index, s, t;
-    INTEGER n;
-    REAL maxValue, temp;
+    INDEX i = 0, j = 0, k = 0, index = 0, s = 0, t = 0;
+    INTEGER n = 0;
+    REAL maxValue = 0.0, temp = 0.0;
     ERROR_ID errorID = _ERROR_NO_ERROR;
 
     if (A == NULL || L == NULL || U == NULL || P == NULL) {
@@ -587,13 +620,12 @@ Input: n行n列矩阵A
 Output: 无
 Input_Output: n行m列矩阵B(即n行m列待求矩阵X)
 Return: 错误号
-Author: Marc Pony(marc_pony@163.com)
 ***********************************************************************************************/
 ERROR_ID solve_matrix_equation_by_lup_decomposition(_IN MATRIX* A, _IN_OUT MATRIX* B)
 {
-    INDEX i, j, k, index, s, t;
-    INTEGER n, m;
-    REAL sum, maxValue, temp;
+    INDEX i = 0, j = 0, k = 0, index = 0, s = 0, t = 0;
+    INTEGER n = 0, m = 0;
+    REAL sum = 0.0, maxValue = 0.0, temp = 0.0;
     MATRIX* L = NULL, * U = NULL, * y = NULL;
     ERROR_ID errorID = _ERROR_NO_ERROR;
     STACKS S;

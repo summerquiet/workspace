@@ -1,6 +1,6 @@
 /*******************************************************************************
 *     File Name :                       inl_matrix_common.c
-*     Create Date :                     2021/7/16
+*     Create Date :                     2022/3/11
 *     Abstract Description :            矩阵运算库公用源文件
 *******************************************************************************/
 
@@ -102,6 +102,21 @@ VOID free_stack(_IN STACKS* S)
 
 	// ...
 	// 释放其他指针
+}
+
+VOID print_matrix(MATRIX* a, STRING string)
+{
+    INDEX i = 0, j = 0;
+    printf("matrix %s:", string);
+    printf("\n");
+    for (i = 0; i < a->rows; i++) {
+        for (j = 0; j < a->columns; j++) {
+            printf("%f  ", a->p[i * a->columns + j]);
+        }
+        printf("\n");
+    }
+
+    printf("\n");
 }
 
 /* EOF */

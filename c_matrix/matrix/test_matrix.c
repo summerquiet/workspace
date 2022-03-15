@@ -6,7 +6,7 @@ int main()
     REAL b[3 * 3] = {1,2,3,6,5,4,3,2,1};
     MATRIX *A = NULL, * B = NULL, * C = NULL, * D = NULL, * E = NULL, * Z = NULL, * invA = NULL, *m = NULL;
     ERROR_ID errorID = _ERROR_NO_ERROR;
-    REAL trace;
+    REAL trace = 0.0;
     STACKS S;
 
     init_stack(&S);
@@ -18,11 +18,11 @@ int main()
     print_matrix(E, "E");
 
     A = creat_matrix(3, 3, &errorID, &S);
-    A->p = a;
+    set_matrix_by_array(A, a, 9);
     print_matrix(A, "A");
 
     B = creat_matrix(3, 3, &errorID, &S);
-    B->p = b;
+    set_matrix_by_array(B, b, 9);
     print_matrix(B, "B");
 
     C = creat_matrix(3, 3, &errorID, &S);
@@ -46,13 +46,21 @@ int main()
 #endif
 
     errorID = matrix_trace(A, &trace);
-    printf("trace: %f\n", trace);
+    printf("errorID: 0x%x, trace: %f\n", errorID, trace);
+
+    REAL norm = 0.0;
+    MATRIX* N = creat_matrix(3, 3, &errorID, &S);
+    REAL n[3 * 3] = {-3, 2, 0, 5, 6, 2, 7, 4, 8};
+    set_matrix_by_array(N, n, 9);
+    errorID = matrix_norm(N, &norm);
+    printf("errorID: 0x%x, norm: %f\n",  errorID, norm);
 
 #if 0
     m = creat_multiple_matrices(3, 3, 2, &errorID, &S);
     m[0].p = a;
     m[1].p = b;
 #endif
+
     free_stack(&S);
 
     return 0;

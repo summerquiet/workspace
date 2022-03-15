@@ -31,6 +31,7 @@ include_directories(${PROJECT_HEADERS})
 file(GLOB PROJECT_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/matrix/inl_matrix_common.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/matrix/inl_matrix_eigen.cc"
+    #"${CMAKE_CURRENT_SOURCE_DIR}/matrix/inl_matrix_c.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/matrix/test_matrix.c"
     )
 
