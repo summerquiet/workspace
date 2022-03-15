@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8.12)
 project(c++11_Sample)
 
 #指定编译器
-set(CMAKE_CXX_FLAGS "-std=c++11 -fPIC -fpermissive -pthread")
+set(CMAKE_CXX_FLAGS "-std=c++14 -fPIC -fpermissive -pthread")
 
 #指定编译版本
 SET(CMAKE_BUILD_TYPE DEBUG)
@@ -22,6 +22,7 @@ add_definitions(-D_UNICODE)
 #指定包含头文件
 file(GLOB PROJECT_HEADERS
 	"${CMAKE_CURRENT_SOURCE_DIR}/include"
+    "/usr/local/include/eigen3"
     )
 
 include_directories(${PROJECT_HEADERS})
