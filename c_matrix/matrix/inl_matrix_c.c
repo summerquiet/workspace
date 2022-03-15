@@ -486,7 +486,7 @@ ERROR_ID matrix_trace(_IN MATRIX* A, _OUT REAL *trace)
 
 
 /**********************************************************************************************
-Function: matrix_2_norm
+Function: matrix_norm
 Description: 矩阵的2-范数
 Input: 矩阵A
 Output: 矩阵A的2-范数
