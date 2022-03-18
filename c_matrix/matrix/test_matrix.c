@@ -1,4 +1,12 @@
+#include <time.h>
 #include "inl_matrix.h"
+
+int64_t GetTickCount(void)
+{
+    struct timespec ts;
+    clock_gettime(CLOCK_REALTIME, &ts);
+    return (ts.tv_sec * 1000 + ts.tv_nsec / 1000000);
+}
 
 int main()
 {
@@ -9,59 +17,78 @@ int main()
     REAL trace = 0.0;
     STACKS S;
 
-    init_stack(&S);
+    int64_t tick_strat = GetTickCount();
 
-    Z = creat_zero_matrix(3, 3, &errorID, &S);
-    print_matrix(Z, "Z");
+    int times = 1;
+    for (int i = 0; i < times; i++) {
+        init_stack(&S);
 
-    E = creat_eye_matrix(3, &errorID, &S);
-    print_matrix(E, "E");
+        Z = creat_zero_matrix(3, 3, &errorID, &S);
+        print_matrix(Z, "Z");
 
-    A = creat_matrix(3, 3, &errorID, &S);
-    set_matrix_by_array(A, a, 9);
-    print_matrix(A, "A");
+        E = creat_eye_matrix(3, &errorID, &S);
+        print_matrix(E, "E");
 
-    B = creat_matrix(3, 3, &errorID, &S);
-    set_matrix_by_array(B, b, 9);
-    print_matrix(B, "B");
+        A = creat_matrix(3, 3, &errorID, &S);
+        set_matrix_by_array(A, a, 9);
+        print_matrix(A, "A");
 
-    C = creat_matrix(3, 3, &errorID, &S);
+        B = creat_matrix(3, 3, &errorID, &S);
+        set_matrix_by_array(B, b, 9);
+        print_matrix(B, "B");
+
+        C = creat_matrix(3, 3, &errorID, &S);
+
+        // case 1: add
+        errorID = matrix_add(A, B, C);
+        print_matrix(C, "add");
+
+        // case 2: sub
+        errorID = matrix_subtraction(A, B, C);
+        print_matrix(C, "sub");
+
+        // case 3: multi
+        errorID = matrix_multiplication(A, B, C);
+        print_matrix(C, "multi");
+
+        // case 4: trans
+        errorID = matrix_transpose(A, C);
+        print_matrix(C, "trans");
+
+        // case 5: inverse
+        errorID = matrix_inverse(A, C);
+        print_matrix(C, "inverse");
+
+        // case 6: trace
+        errorID = matrix_trace(A, &trace);
+        printf("errorID: 0x%x, trace: %f\n", errorID, trace);
+
+        REAL norm = 0.0;
+        MATRIX* N = creat_matrix(3, 3, &errorID, &S);
+        REAL n[3 * 3] = {-3, 2, 0, 5, 6, 2, 7, 4, 8};
+        set_matrix_by_array(N, n, 9);
+        // print_matrix(N, "N");
+
+        // case 7: norm
+        errorID = matrix_norm(N, &norm);
+        printf("errorID: 0x%x, norm: %f\n",  errorID, norm);
+
+        REAL item = 0.0;
+        errorID = get_matrix_item(N, 2, 2, &item);
+        printf("errorID: 0x%x, item: %f\n",  errorID, item);
+
 #if 0
-    errorID = matrix_add(A, B, C);
-    print_matrix(C, "C");
-
-    errorID = matrix_subtraction(A, B, C);
-    print_matrix(C, "C");
-
-    errorID = matrix_multiplication(A, B, C);
-    print_matrix(C, "C");
-
-    D = creat_matrix(3, 3, &errorID, &S);
-    errorID = matrix_transpose(A, D);
-    print_matrix(D, "D");
-
-    invA = creat_matrix(3, 3, &errorID, &S);
-    errorID = matrix_inverse(A, invA);
-    print_matrix(invA, "invA");
+        m = creat_multiple_matrices(3, 3, 2, &errorID, &S);
+        m[0].p = a;
+        m[1].p = b;
 #endif
 
-    errorID = matrix_trace(A, &trace);
-    printf("errorID: 0x%x, trace: %f\n", errorID, trace);
+        free_stack(&S);
+    }
 
-    REAL norm = 0.0;
-    MATRIX* N = creat_matrix(3, 3, &errorID, &S);
-    REAL n[3 * 3] = {-3, 2, 0, 5, 6, 2, 7, 4, 8};
-    set_matrix_by_array(N, n, 9);
-    errorID = matrix_norm(N, &norm);
-    printf("errorID: 0x%x, norm: %f\n",  errorID, norm);
+    int64_t tick_end = GetTickCount();
 
-#if 0
-    m = creat_multiple_matrices(3, 3, 2, &errorID, &S);
-    m[0].p = a;
-    m[1].p = b;
-#endif
-
-    free_stack(&S);
+    printf("run %d times, cost tick: %lld\n", times, tick_end - tick_strat);
 
     return 0;
 }

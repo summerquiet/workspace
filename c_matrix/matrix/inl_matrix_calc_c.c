@@ -44,225 +44,6 @@
 *******************************************************************************/
 
 /**********************************************************************************************
-Function: creat_matrix
-Description: 创建矩阵
-Input: 矩阵行数rows，列数columns
-Output: 错误号指针errorID，栈指针S
-Input_Output: 无
-Return: 矩阵指针
-***********************************************************************************************/
-MATRIX* creat_matrix(_IN INTEGER rows, _IN INTEGER columns, _OUT ERROR_ID* errorID, _OUT STACKS* S)
-{
-    MATRIX* matrix = NULL;
-    MATRIX_NODE* matrixNode = NULL;
-    MATRIX_ELEMENT_NODE* matrixElementNode = NULL;
-
-    if (errorID == NULL) {
-        return NULL;
-    }
-
-    *errorID = _ERROR_NO_ERROR;
-    if (rows <= 0 || columns <= 0 || S == NULL) {
-        *errorID = _ERROR_INPUT_PARAMETERS_ERROR;
-        return NULL;
-    }
-
-    matrix = (MATRIX*)malloc(sizeof(MATRIX));
-    matrixNode = (MATRIX_NODE*)malloc(sizeof(MATRIX_NODE));
-    matrixElementNode = (MATRIX_ELEMENT_NODE*)malloc(sizeof(MATRIX_ELEMENT_NODE));
-    if (matrix == NULL || matrixNode == NULL || matrixElementNode == NULL) {
-        free(matrix);
-        matrix = NULL;
-        free(matrixNode);
-        matrixNode = NULL;
-        free(matrixElementNode);
-        matrixElementNode = NULL;
-
-        *errorID = _ERROR_FAILED_TO_ALLOCATE_HEAP_MEMORY;
-        return NULL;
-    }
-
-    matrix->rows = rows;
-    matrix->columns = columns;
-    matrix->p = (REAL*)malloc(rows * columns * sizeof(REAL));  //确保matrix非空才能执行指针操作
-    if (matrix->p == NULL) {
-        free(matrix->p);
-        matrix->p = NULL;
-        free(matrix);
-        matrix = NULL;
-        free(matrixNode);
-        matrixNode = NULL;
-        free(matrixElementNode);
-        matrixElementNode = NULL;
-
-        *errorID = _ERROR_FAILED_TO_ALLOCATE_HEAP_MEMORY;
-        return NULL;
-    }
-
-    matrixNode->ptr = matrix;
-    matrixNode->next = S->matrixNode;
-    S->matrixNode = matrixNode;
-
-    matrixElementNode->ptr = matrix->p;
-    matrixElementNode->next = S->matrixElementNode;
-    S->matrixElementNode = matrixElementNode;
-
-    return matrix;
-}
-
-
-/**********************************************************************************************
-Function: creat_multiple_matrices
-Description: 创建多个矩阵
-Input: 矩阵行数rows，列数columns，个数count
-Output: 错误号指针errorID，栈指针S
-Input_Output: 无
-Return: 矩阵指针
-***********************************************************************************************/
-MATRIX* creat_multiple_matrices(_IN INTEGER rows, _IN INTEGER columns, _IN INTEGER count, _OUT ERROR_ID* errorID, _OUT STACKS* S)
-{
-    INDEX i = 0;
-    MATRIX* matrix = NULL, *p = NULL;
-    MATRIX_NODE* matrixNode = NULL;
-
-    if (errorID == NULL) {
-        return NULL;
-    }
-
-    *errorID = _ERROR_NO_ERROR;
-    if (rows <= 0 || columns <= 0 || count <= 0 || S == NULL) {
-        *errorID = _ERROR_INPUT_PARAMETERS_ERROR;
-        return NULL;
-    }
-
-    matrix = (MATRIX*)malloc(count * sizeof(MATRIX));
-    matrixNode = (MATRIX_NODE*)malloc(sizeof(MATRIX_NODE));
-    if (matrix == NULL || matrixNode == NULL) {
-        free(matrix);
-        matrix = NULL;
-        free(matrixNode);
-        matrixNode = NULL;
-
-        *errorID = _ERROR_FAILED_TO_ALLOCATE_HEAP_MEMORY;
-        return NULL;
-    }
-
-    for (i = 0; i < count; i++) {
-        p = creat_matrix(rows, columns, errorID, S);
-        if (p == NULL) {
-            free(matrix);
-            matrix = NULL;
-            free(matrixNode);
-            matrixNode = NULL;
-
-            *errorID = _ERROR_FAILED_TO_ALLOCATE_HEAP_MEMORY;
-            return NULL;
-        }
-
-        matrix[i] = *p;
-    }
-
-    matrixNode->ptr = matrix;
-    matrixNode->next = S->matrixNode;
-    S->matrixNode = matrixNode;
-
-    return matrix;
-}
-
-/**********************************************************************************************
-Function: creat_zero_matrix
-Description: 创建零矩阵
-Input: 矩阵行数rows，列数columns
-Output: 错误号指针errorID，栈指针S
-Input_Output: 无
-Return: 矩阵指针
-***********************************************************************************************/
-MATRIX* creat_zero_matrix(_IN INTEGER rows, _IN INTEGER columns, _OUT ERROR_ID* errorID, _OUT STACKS* S)
-{
-    MATRIX* matrix = NULL;
-
-    if (errorID == NULL) {
-        return NULL;
-    }
-
-    *errorID = _ERROR_NO_ERROR;
-    if (rows <= 0 || columns <= 0 || S == NULL) {
-        *errorID = _ERROR_INPUT_PARAMETERS_ERROR;
-        return NULL;
-    }
-
-    matrix = creat_matrix(rows, columns, errorID, S);
-    if (*errorID == _ERROR_NO_ERROR) {
-        memset(matrix->p, 0, rows * columns * sizeof(REAL));
-    }
-
-    return matrix;
-}
-
-
-/**********************************************************************************************
-Function: creat_eye_matrix
-Description: 创建单位矩阵
-Input: 矩阵行数rows，列数columns
-Output: 错误号指针errorID，栈指针S
-Input_Output: 无
-Return: 矩阵指针
-***********************************************************************************************/
-MATRIX* creat_eye_matrix(_IN INTEGER n, _OUT ERROR_ID* errorID, _OUT STACKS* S)
-{
-    INDEX i = 0;
-    MATRIX* matrix = NULL;
-
-    if (errorID == NULL) {
-        return NULL;
-    }
-
-    *errorID = _ERROR_NO_ERROR;
-    if (n <= 0 || S == NULL) {
-        *errorID = _ERROR_INPUT_PARAMETERS_ERROR;
-        return NULL;
-    }
-
-    matrix = creat_matrix(n, n, errorID, S);
-    if (*errorID == _ERROR_NO_ERROR) {
-        memset(matrix->p, 0, n * n * sizeof(REAL));
-        for (i = 0; i < n; i++) {
-            matrix->p[i * n + i] = 1.0;
-        }
-    }
-
-    return matrix;
-}
-
-
-/**********************************************************************************************
-Function: set_matrix_by_array
-Description: 使用array对matrix赋值
-Input: 赋值用array，赋值用array count
-Input_Output: 矩阵matrix
-Return: 错误号
-***********************************************************************************************/
-ERROR_ID set_matrix_by_array(_IN_OUT MATRIX* matrix, _IN REAL array[], _IN INDEX array_count)
-{
-    INDEX i = 0, j = 0;
-    ERROR_ID errorID = _ERROR_NO_ERROR;
-
-    if (matrix == NULL || array == NULL) {
-        return _ERROR_INPUT_PARAMETERS_ERROR;
-    }
-
-    if (array_count != matrix->rows * matrix->columns) {
-        return _ERROR_INPUT_PARAMETERS_ERROR;
-    }
-
-    // Copy data
-    memcpy(matrix->p, array, array_count * sizeof(REAL));
-
-    return errorID;
-}
-
-
-/**********************************************************************************************
 Function: matrix_add
 Description: 矩阵A + 矩阵B = 矩阵C
 Input: 矩阵A,矩阵B
@@ -487,24 +268,34 @@ ERROR_ID matrix_trace(_IN MATRIX* A, _OUT REAL *trace)
 
 /**********************************************************************************************
 Function: matrix_norm
-Description: 矩阵的2-范数
+Description: 矩阵的Frobenius-范数
 Input: 矩阵A
-Output: 矩阵A的2-范数
+Output: 矩阵A的Frobenius-范数
 Input_Output: 无
 Return: 错误号
 ***********************************************************************************************/
 ERROR_ID matrix_norm(_IN MATRIX* A, _OUT REAL* norm)
 {
     INDEX i = 0, j = 0;
+    MATRIX* AT = NULL, *ATA = NULL;
     ERROR_ID errorID = _ERROR_NO_ERROR;
+    STACKS S;
+    REAL sum = 0.0;
+    INTEGER found_tr = 0;
 
     if (A == NULL || norm == NULL) {
         errorID = _ERROR_INPUT_PARAMETERS_ERROR;
         return errorID;
     }
 
-    // TODO:
-    errorID = _ERROR_NO_IMPLEMENT;
+    // Calc Frobenius-norm
+    for (i = 0; i < A->rows; i++) {
+        for (j = 0; j < A->columns; j++) {
+            sum += A->p[i * A->columns + j] * A->p[i * A->columns + j];
+        }
+    }
+
+    *norm = sqrt(sum);
 
     return errorID;
 }

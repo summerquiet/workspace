@@ -125,8 +125,6 @@ Return: 无
 ***********************************************************************************************/
 VOID free_stack(_IN STACKS* S);
 
-void print_matrix(MATRIX* a, STRING string);
-
 #endif  // C_INL_MATRIX_COMMON_H
 
 /* EOF */

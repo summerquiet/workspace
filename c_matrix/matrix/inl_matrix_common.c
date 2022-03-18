@@ -104,19 +104,4 @@ VOID free_stack(_IN STACKS* S)
 	// 释放其他指针
 }
 
-VOID print_matrix(MATRIX* a, STRING string)
-{
-    INDEX i = 0, j = 0;
-    printf("matrix %s:", string);
-    printf("\n");
-    for (i = 0; i < a->rows; i++) {
-        for (j = 0; j < a->columns; j++) {
-            printf("%f  ", a->p[i * a->columns + j]);
-        }
-        printf("\n");
-    }
-
-    printf("\n");
-}
-
 /* EOF */

@@ -36,6 +36,9 @@ extern "C" {
 * (5)Prototype Declare Section
 *******************************************************************************/
 
+// Implement in inl_matrix.c
+void print_matrix(MATRIX* a, STRING string);
+
 /**********************************************************************************************
 Function: creat_matrix
 Description: 创建矩阵
@@ -91,6 +94,17 @@ ERROR_ID set_matrix_by_array(_IN_OUT MATRIX* matrix, _IN REAL array[], _IN INDEX
 
 
 /**********************************************************************************************
+Function: get_matrix_item
+Description: 通过输入的行和列获取矩阵中的某个元素
+Input: 矩阵matrix，矩阵的行row，矩阵的列column
+Output：矩阵中的某个元素
+Return: 错误号
+***********************************************************************************************/
+ERROR_ID get_matrix_item(_IN MATRIX* matrix, _IN INDEX row, _IN INDEX column, _OUT REAL* value);
+
+
+// Implement in inl_matrix_calc_c.c or inl_matrix_calc_eigen.cc
+/**********************************************************************************************
 Function: matrix_add
 Description: 矩阵A + 矩阵B = 矩阵C
 Input: 矩阵A,矩阵B
@@ -99,6 +113,7 @@ Input_Output: 无
 Return: 错误号
 ***********************************************************************************************/
 ERROR_ID matrix_add(_IN MATRIX* A, _IN MATRIX* B, _OUT MATRIX *C);
+
 
 /**********************************************************************************************
 Function: matrix_subtraction
@@ -157,9 +172,9 @@ ERROR_ID matrix_trace(_IN MATRIX* A, _OUT REAL* trace);
 
 /**********************************************************************************************
 Function: matrix_norm
-Description: 矩阵的2-范数
+Description: 矩阵的Frobenius-范数
 Input: 矩阵A
-Output: 矩阵A的2-范数
+Output: 矩阵A的Frobenius-范数
 Input_Output: 无
 Return: 错误号
 ***********************************************************************************************/
