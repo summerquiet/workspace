@@ -14,6 +14,7 @@
 *******************************************************************************/
 #include "inl_matrix.h"
 
+
 /*******************************************************************************
 * (3)Macro Define Section
 *******************************************************************************/
@@ -154,6 +155,42 @@ ERROR_ID matrix_multiplication(_IN MATRIX* A, _IN MATRIX* B, _OUT MATRIX* C)
 
     return errorID;
 }
+
+
+/**********************************************************************************************
+Function: matrix_num_multiplication
+Description: 矩阵乘法B = num * A
+Input: 实数num,矩阵A
+Output: 矩阵B
+Input_Output: 无
+Return: 错误号
+***********************************************************************************************/
+ERROR_ID matrix_num_multiplication(_IN REAL num, _IN MATRIX* A, _OUT MATRIX* B)
+{
+    INDEX i = 0, j = 0;
+    ERROR_ID errorID = _ERROR_NO_ERROR;
+
+    // Check input
+    if (A == NULL || B == NULL) {
+        errorID = _ERROR_INPUT_PARAMETERS_ERROR;
+        return errorID;
+    }
+
+    if (A->rows != B->rows || A->columns != B->columns) {
+        errorID = _ERROR_MATRIX_MULTIPLICATION;
+        return errorID;
+    }
+
+    // Calculation
+    for (i = 0; i < B->rows; i++) {
+        for (j = 0; j < B->columns; j++) {
+            *(B->p + i * B->columns + j) = *(A->p + i * A->columns + j) * num;
+        }
+    }
+
+    return errorID;
+}
+
 
 /**********************************************************************************************
 Function: matrix_inverse

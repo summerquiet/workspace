@@ -77,6 +77,10 @@ int main()
         errorID = get_matrix_item(N, 2, 2, &item);
         printf("errorID: 0x%x, item: %f\n",  errorID, item);
 
+        // case 8: num multi
+        errorID = matrix_num_multiplication(-1, A, C);
+        print_matrix(C, "C");
+
 #if 0
         m = creat_multiple_matrices(3, 3, 2, &errorID, &S);
         m[0].p = a;

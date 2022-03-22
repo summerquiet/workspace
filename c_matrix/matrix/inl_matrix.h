@@ -138,6 +138,17 @@ ERROR_ID matrix_multiplication(_IN MATRIX* A, _IN MATRIX* B, _OUT MATRIX* C);
 
 
 /**********************************************************************************************
+Function: matrix_num_multiplication
+Description: 矩阵乘法B = num * A
+Input: 实数num,矩阵A
+Output: 矩阵B
+Input_Output: 无
+Return: 错误号
+***********************************************************************************************/
+ERROR_ID matrix_num_multiplication(_IN REAL num, _IN MATRIX* A, _OUT MATRIX* B);
+
+
+/**********************************************************************************************
 Function: matrix_inverse
 Description: 矩阵求逆
 Input: 矩阵A
