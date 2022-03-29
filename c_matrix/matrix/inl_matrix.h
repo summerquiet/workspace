@@ -102,8 +102,17 @@ Return: 错误号
 ***********************************************************************************************/
 ERROR_ID get_matrix_item(_IN MATRIX* matrix, _IN INDEX row, _IN INDEX column, _OUT REAL* value);
 
+/**********************************************************************************************
+Function: get_matrix_items
+Description: 获取矩阵中的所有元素
+Input: 矩阵matrix，矩阵的行row，矩阵的列column
+Output：矩阵中的所有元素
+Return: 错误号
+***********************************************************************************************/
+ERROR_ID get_matrix_items(_IN MATRIX* matrix, _IN_OUT REAL array[], _IN INDEX array_count);
 
-// Implement in inl_matrix_calc_c.c or inl_matrix_calc_eigen.cc
+
+// Implement in inl_matrix_calc_c.c or inl_matrix_calc_eigen.cpp
 /**********************************************************************************************
 Function: matrix_add
 Description: 矩阵A + 矩阵B = 矩阵C
@@ -202,6 +211,20 @@ Return: 错误号
 参考：https://zhuanlan.zhihu.com/p/84210687
 ***********************************************************************************************/
 ERROR_ID lup_decomposition(_IN MATRIX* A, _OUT MATRIX* L, _OUT MATRIX* U, _OUT MATRIX* P);
+
+
+/**********************************************************************************************
+Function: matrix_cholesky_factor_upper
+Description: n行n列矩阵Cholesky分解A = R'*R
+Input: n行n列矩阵A
+Output: 将对称正定矩阵 A 分解成满足 A = R'*R 的上三角 R;
+如果 flag = 0，则输入矩阵是对称正定矩阵，分解成功。
+如果 flag 不为零，则输入矩阵不是对称正定矩阵，flag 为整数，表示分解失败的主元位置的索引。
+Input_Output: 无
+Return: 错误号
+参考：武汉大学github分享代码
+***********************************************************************************************/
+ERROR_ID matrix_cholesky_factor_upper(_IN MATRIX* A, _OUT MATRIX *R, _OUT INTEGER *flag);
 
 
 /**********************************************************************************************

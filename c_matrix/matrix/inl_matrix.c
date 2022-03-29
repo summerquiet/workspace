@@ -304,4 +304,29 @@ ERROR_ID get_matrix_item(_IN MATRIX* matrix, _IN INDEX row, _IN INDEX column, _O
     return errorID;
 }
 
+/**********************************************************************************************
+Function: get_matrix_items
+Description: 获取矩阵中的所有元素
+Input: 矩阵matrix
+Output：矩阵中的所有元素
+Return: 错误号
+***********************************************************************************************/
+ERROR_ID get_matrix_items(_IN MATRIX* matrix, _IN_OUT REAL array[], _IN INDEX array_count)
+{
+    ERROR_ID errorID = _ERROR_NO_ERROR;
+
+    if (matrix == NULL || array == NULL) {
+        return _ERROR_INPUT_PARAMETERS_ERROR;
+    }
+
+    if (matrix->rows * matrix->columns < array_count) {
+        return _ERROR_INPUT_PARAMETERS_ERROR;
+    }
+
+    // Get items
+    memcpy(array, matrix->p, array_count * sizeof(REAL));
+
+    return errorID;
+}
+
 /* EOF */

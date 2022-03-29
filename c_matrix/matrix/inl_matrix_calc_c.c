@@ -367,6 +367,7 @@ ERROR_ID lup_decomposition(_IN MATRIX* A, _OUT MATRIX* L, _OUT MATRIX* U, _OUT M
     memcpy(U->p, A->p, n * n * sizeof(REAL));
     memset(L->p, 0, n * n * sizeof(REAL));
     memset(P->p, 0, n * n * sizeof(REAL));
+
     for (i = 0; i < n; i++) {
         L->p[i * n + i] = 1.0;
         P->p[i * n + i] = 1.0;
@@ -418,12 +419,102 @@ ERROR_ID lup_decomposition(_IN MATRIX* A, _OUT MATRIX* L, _OUT MATRIX* U, _OUT M
         for (i = j + 1; i < n; i++) {
             s = i * n + j;
             L->p[s] = U->p[s] / U->p[j * n + j];
-            for (k = j; k < n; k++)
-            {
+            for (k = j; k < n; k++) {
                 U->p[i * n + k] -= L->p[s] * U->p[j * n + k];
             }
         }
     }
+
+    return errorID;
+}
+
+
+/**********************************************************************************************
+Function: matrix_cholesky_factor_upper
+Description: n行n列矩阵Cholesky分解A = R'*R
+Input: n行n列矩阵A
+Output: 将对称正定矩阵 A 分解成满足 A = R'*R 的上三角 R;
+如果 flag = 0，则输入矩阵是对称正定矩阵，分解成功。
+如果 flag 不为零，则输入矩阵不是对称正定矩阵，flag 为整数，表示分解失败的主元位置的索引。
+Input_Output: 无
+Return: 错误号
+参考：武汉大学github分享代码
+***********************************************************************************************/
+ERROR_ID matrix_cholesky_factor_upper(_IN MATRIX* A, _OUT MATRIX *R, _OUT INTEGER *flag)
+{
+    INDEX n = 0, i = 0, j = 0, k = 0;
+    REAL sum2 = 0.0;
+    ERROR_ID errorID = _ERROR_NO_ERROR;
+    MATRIX* L = NULL;
+    STACKS S;
+
+    // check input
+    if (A == NULL || R == NULL || flag == NULL) {
+        errorID = _ERROR_INPUT_PARAMETERS_ERROR;
+        return errorID;
+    }
+
+    if (A->rows != A->columns) {
+        errorID = _ERROR_MATRIX_MUST_BE_SQUARE;
+        return errorID;
+    }
+
+    if (A->rows != R->rows
+        || A->columns != R->columns) {
+        errorID = _ERROR_MATRIX_ROWS_OR_COLUMNS_NOT_EQUAL;
+        return errorID;
+    }
+
+    // init output
+    *flag = 0;
+
+    init_stack(&S);
+
+    L = creat_matrix(R->rows, R->columns, &errorID, &S);
+    if (errorID != _ERROR_NO_ERROR) {
+        goto EXIT;
+    }
+
+    n = A->rows;
+    memcpy(L->p, A->p, n * n * sizeof(REAL));
+
+    for (j = 0; j < n; j++) {
+        for (i = 0; i < j; i++) {
+            L->p[j + i * n] = 0.0;
+        }
+
+        for (i = j; i < n; i++) {
+            sum2 = L->p[i+j*n];
+
+            for (k = 0; k < j; k++) {
+                sum2 = sum2 - L->p[k + j * n] * L->p[k + i * n];
+            }
+
+            if (i == j) {
+                if (sum2 <= 0.0) {
+                    *flag = 1;
+                    errorID = _ERROR_CHOLESKY_DECOMPOSITION_FAILED;
+                    goto EXIT;
+                }
+
+                L->p[j + i * n] = sqrt(sum2);
+            }
+            else {
+                if (L->p[j + j * n] != 0.0) {
+                    L->p[j + i * n] = sum2 / L->p[j + j * n];
+                }
+                else {
+                    L->p[j + i * n] = 0.0;
+                }
+            }
+        }
+    }
+
+    // Need transpose from L to R
+    errorID = matrix_transpose(L, R);
+
+EXIT:
+    free_stack(&S);
 
     return errorID;
 }
@@ -530,8 +621,7 @@ ERROR_ID solve_matrix_equation_by_lup_decomposition(_IN MATRIX* A, _IN_OUT MATRI
     }
 
     for (i = 0; i < n; i++) {
-        if (fabs(U->p[i * n + i]) < 1.0e-20)
-        {
+        if (fabs(U->p[i * n + i]) < 1.0e-20) {
             errorID = _ERROR_MATRIX_EQUATION_HAS_NO_SOLUTIONS;
             goto EXIT;
         }

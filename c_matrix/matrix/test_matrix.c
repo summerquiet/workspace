@@ -77,9 +77,16 @@ int main()
         errorID = get_matrix_item(N, 2, 2, &item);
         printf("errorID: 0x%x, item: %f\n",  errorID, item);
 
-        // case 8: num multi
-        errorID = matrix_num_multiplication(-1, A, C);
-        print_matrix(C, "C");
+        // case8: cholesky
+        MATRIX* Ch = creat_matrix(3, 3, &errorID, &S);
+        // REAL ch[3 * 3] = {4, -1, 2, -1, 6, 0, 2, 0, 5};
+        REAL ch[3 * 3] = {1, 0, 1, 0, 2, 0, 1, 0, 3};
+        set_matrix_by_array(Ch, ch, 9);
+
+        INDEX flag = 0;
+        errorID = matrix_cholesky_factor_upper(Ch, C, &flag);
+        printf("errorID: 0x%x, flag: %d\n", errorID, flag);
+        print_matrix(C, "Cholesky upper");
 
 #if 0
         m = creat_multiple_matrices(3, 3, 2, &errorID, &S);

@@ -442,6 +442,68 @@ ERROR_ID lup_decomposition(_IN MATRIX* A, _OUT MATRIX* L, _OUT MATRIX* U, _OUT M
 
 
 /**********************************************************************************************
+Function: matrix_cholesky_factor_upper
+Description: n行n列矩阵Cholesky分解A = R'*R
+Input: n行n列矩阵A
+Output: 将对称正定矩阵 A 分解成满足 A = R'*R 的上三角 R;
+如果 flag = 0，则输入矩阵是对称正定矩阵，分解成功。
+如果 flag 不为零，则输入矩阵不是对称正定矩阵，flag 为整数，表示分解失败的主元位置的索引。
+Input_Output: 无
+Return: 错误号
+***********************************************************************************************/
+ERROR_ID matrix_cholesky_factor_upper(_IN MATRIX* A, _OUT MATRIX *R, _OUT INTEGER *flag)
+{
+    INDEX i = 0, j = 0;
+    ERROR_ID errorID = _ERROR_NO_ERROR;
+
+    if (A == NULL || R == NULL || flag == NULL) {
+        errorID = _ERROR_INPUT_PARAMETERS_ERROR;
+        return errorID;
+    }
+
+    if (A->rows != A->columns
+        || R->rows != R->columns) {
+        errorID = _ERROR_MATRIX_MUST_BE_SQUARE;
+        return errorID;
+    }
+
+    if (A->rows != R->rows
+        || A->columns != R->columns) {
+        errorID = _ERROR_MATRIX_ROWS_OR_COLUMNS_NOT_EQUAL;
+        return errorID;
+    }
+
+    // Convert A to Eigen Matrix
+    Eigen::MatrixXd em_A(A->rows, A->columns);
+    for (i = 0; i < A->rows; i++) {
+        for (j = 0; j < A->columns; j++) {
+            em_A(i, j) = *(A->p + i * A->columns + j);
+        }
+    }
+
+    // Calculation
+    Eigen::LLT<Eigen::MatrixXd> llt;
+    llt.compute(em_A);
+    if (llt.info() == Eigen::Success) {
+        *flag = 0;
+
+        // Convert Eigen Matrix to output
+        Eigen::MatrixXd LT = llt.matrixL().transpose();
+        for (i = 0; i < R->rows; i++) {
+            for (j = 0; j < R->columns; j++) {
+                *(R->p + i * R->columns + j) = LT(i, j);
+            }
+        }
+    }
+    else {
+        *flag = 1;
+    }
+
+    return errorID;
+}
+
+
+/**********************************************************************************************
 Function: solve_matrix_equation_by_lup_decomposition
 Description: LUP分解解矩阵方程AX=B,其中A为n行n列矩阵，B为n行m列矩阵，X为n行m列待求矩阵(写到矩阵B)
 Input: n行n列矩阵A
