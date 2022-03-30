@@ -251,6 +251,34 @@ MATRIX* creat_eye_matrix(_IN INTEGER n, _OUT ERROR_ID* errorID, _OUT STACKS* S)
 
 
 /**********************************************************************************************
+Function: matrix_assign
+Description: 矩阵赋值，将矩阵A赋值给矩阵B
+Input: 矩阵A
+Output：矩阵B
+Return: 错误号
+***********************************************************************************************/
+ERROR_ID matrix_assign(_IN MATRIX* A, _OUT MATRIX* B)
+{
+    ERROR_ID errorID = _ERROR_NO_ERROR;
+
+    // Check input
+    if (A == NULL || B == NULL) {
+        return _ERROR_INPUT_PARAMETERS_ERROR;
+    }
+
+    if (A->rows != B->rows
+        || A->columns != B->columns) {
+        return _ERROR_MATRIX_ROWS_OR_COLUMNS_NOT_EQUAL;
+    }
+
+    // Copy items from A 2 B
+    memcpy(B->p, A->p, A->rows * A->columns * sizeof(REAL));
+
+    return errorID;
+}
+
+
+/**********************************************************************************************
 Function: set_matrix_by_array
 Description: 使用array对matrix赋值
 Input: 赋值用array，赋值用array count

@@ -84,6 +84,16 @@ MATRIX* creat_eye_matrix(_IN INTEGER n, _OUT ERROR_ID* errorID, _OUT STACKS* S);
 
 
 /**********************************************************************************************
+Function: matrix_assign
+Description: 矩阵赋值，将矩阵A赋值给矩阵B
+Input: 矩阵A
+Output：矩阵B
+Return: 错误号
+***********************************************************************************************/
+ERROR_ID matrix_assign(_IN MATRIX* A, _OUT MATRIX* B);
+
+
+/**********************************************************************************************
 Function: set_matrix_by_array
 Description: 使用array对matrix赋值
 Input: 赋值用array，赋值用array count

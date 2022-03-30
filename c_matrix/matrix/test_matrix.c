@@ -88,6 +88,10 @@ int main()
         printf("errorID: 0x%x, flag: %d\n", errorID, flag);
         print_matrix(C, "Cholesky upper");
 
+        // case9 assign
+        errorID = matrix_assign(A, C);
+        print_matrix(C, "C");
+
 #if 0
         m = creat_multiple_matrices(3, 3, 2, &errorID, &S);
         m[0].p = a;
