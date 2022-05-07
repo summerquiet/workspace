@@ -14,7 +14,7 @@
 *******************************************************************************/
 #include "inl_matrix.h"
 #include <Eigen/Dense>
-
+#include <iostream>
 
 /*******************************************************************************
 * (3)Macro Define Section
@@ -53,7 +53,7 @@ Output: 矩阵C
 Input_Output: 无
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID matrix_add(_IN MATRIX* A, _IN MATRIX* B, _OUT MATRIX* C)
+ERROR_ID matrix_add(_IN const MATRIX* A, _IN const MATRIX* B, _OUT MATRIX* C)
 {
     INDEX i = 0, j = 0;
     ERROR_ID errorID = _ERROR_NO_ERROR;
@@ -106,7 +106,7 @@ Output: 矩阵C
 Input_Output: 无
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID matrix_subtraction(_IN MATRIX* A, _IN MATRIX* B, _OUT MATRIX* C)
+ERROR_ID matrix_subtraction(_IN const MATRIX* A, _IN const MATRIX* B, _OUT MATRIX* C)
 {
     INDEX i = 0, j = 0;
     ERROR_ID errorID = _ERROR_NO_ERROR;
@@ -118,6 +118,7 @@ ERROR_ID matrix_subtraction(_IN MATRIX* A, _IN MATRIX* B, _OUT MATRIX* C)
 
     if (A->rows != B->rows || A->rows != C->rows || B->rows != C->rows
         || A->columns != B->columns || A->columns != C->columns || B->columns != C->columns) {
+        printf("CPP matrix_subtraction error A[%d*%d] B[%d*%d] C[%d*%d]\n", A->rows, A->columns, B->rows, B->columns, C->rows, C->columns);
         errorID = _ERROR_MATRIX_ROWS_OR_COLUMNS_NOT_EQUAL;
         return errorID;
     }
@@ -159,7 +160,7 @@ Output: 矩阵C
 Input_Output: 无
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID matrix_multiplication(_IN MATRIX* A, _IN MATRIX* B, _OUT MATRIX* C)
+ERROR_ID matrix_multiplication(_IN const MATRIX* A, _IN const MATRIX* B, _OUT MATRIX* C)
 {
     INDEX i = 0, j = 0;
     ERROR_ID errorID = _ERROR_NO_ERROR;
@@ -170,6 +171,7 @@ ERROR_ID matrix_multiplication(_IN MATRIX* A, _IN MATRIX* B, _OUT MATRIX* C)
     }
 
     if (A->columns != B->rows || A->rows != C->rows || B->columns != C->columns) {
+        printf("CPP matrix_multiplication error A[%d*%d] B[%d*%d] C[%d*%d]\n", A->rows, A->columns, B->rows, B->columns, C->rows, C->columns);
         errorID = _ERROR_MATRIX_MULTIPLICATION;
         return errorID;
     }
@@ -210,7 +212,7 @@ Output: 矩阵B
 Input_Output: 无
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID matrix_num_multiplication(_IN REAL num, _IN MATRIX* A, _OUT MATRIX* B)
+ERROR_ID matrix_num_multiplication(_IN REAL num, _IN const MATRIX* A, _OUT MATRIX* B)
 {
     INDEX i = 0, j = 0;
     ERROR_ID errorID = _ERROR_NO_ERROR;
@@ -256,7 +258,7 @@ Output: 矩阵A的逆矩阵
 Input_Output: 无
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID matrix_inverse(_IN MATRIX* A, _OUT MATRIX* invA)
+ERROR_ID matrix_inverse(_IN const MATRIX* A, _OUT MATRIX* invA)
 {
     INDEX i = 0, j = 0;
     ERROR_ID errorID = _ERROR_NO_ERROR;
@@ -277,6 +279,13 @@ ERROR_ID matrix_inverse(_IN MATRIX* A, _OUT MATRIX* invA)
         for (j = 0; j < A->columns; j++) {
             em_A(i, j) = *(A->p + i * A->columns + j);
         }
+    }
+
+    // Check is invertible
+    Eigen::FullPivLU<Eigen::MatrixXd> lu(em_A);
+    if (!lu.isInvertible()) {
+        errorID = _ERROR_MATRIX_INVERSE_FAILED;
+        return errorID;
     }
 
     // Calculation
@@ -301,7 +310,7 @@ Output: 矩阵A的转置
 Input_Output: 无
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID matrix_transpose(_IN MATRIX* A, _OUT MATRIX* transposeA)
+ERROR_ID matrix_transpose(_IN const MATRIX* A, _OUT MATRIX* transposeA)
 {
     INDEX i = 0, j = 0;
     ERROR_ID errorID = _ERROR_NO_ERROR;
@@ -312,6 +321,7 @@ ERROR_ID matrix_transpose(_IN MATRIX* A, _OUT MATRIX* transposeA)
     }
 
     if (A->rows != transposeA->columns || A->columns != transposeA->rows) {
+        printf("matrix_transpose [%d*%d]=[%d*%d]\n", A->rows, A->columns, transposeA->rows, transposeA->columns);
         errorID = _ERROR_MATRIX_TRANSPOSE_FAILED;
         return errorID;
     }
@@ -346,7 +356,7 @@ Output: 矩阵A的迹
 Input_Output: 无
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID matrix_trace(_IN MATRIX* A, _OUT REAL *trace)
+ERROR_ID matrix_trace(_IN const MATRIX* A, _OUT REAL *trace)
 {
     INDEX i = 0, j = 0;
     ERROR_ID errorID = _ERROR_NO_ERROR;
@@ -384,7 +394,7 @@ Output: 矩阵A的Frobenius-范数
 Input_Output: 无
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID matrix_norm(_IN MATRIX* A, _OUT REAL* norm)
+ERROR_ID matrix_norm(_IN const MATRIX* A, _OUT REAL* norm)
 {
     INDEX i = 0, j = 0;
     ERROR_ID errorID = _ERROR_NO_ERROR;
@@ -418,7 +428,7 @@ Input_Output: 无
 Return: 错误号
 参考：https://zhuanlan.zhihu.com/p/84210687
 ***********************************************************************************************/
-ERROR_ID lup_decomposition(_IN MATRIX* A, _OUT MATRIX* L, _OUT MATRIX* U, _OUT MATRIX* P)
+ERROR_ID lup_decomposition(_IN const MATRIX* A, _OUT MATRIX* L, _OUT MATRIX* U, _OUT MATRIX* P)
 {
     INDEX i = 0, j = 0, k = 0, index = 0, s = 0, t = 0;
     INTEGER n = 0;
@@ -451,7 +461,7 @@ Output: 将对称正定矩阵 A 分解成满足 A = R'*R 的上三角 R;
 Input_Output: 无
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID matrix_cholesky_factor_upper(_IN MATRIX* A, _OUT MATRIX *R, _OUT INTEGER *flag)
+ERROR_ID matrix_cholesky_factor_upper(_IN const MATRIX* A, _OUT MATRIX *R, _OUT INTEGER *flag)
 {
     INDEX i = 0, j = 0;
     ERROR_ID errorID = _ERROR_NO_ERROR;
@@ -488,7 +498,7 @@ ERROR_ID matrix_cholesky_factor_upper(_IN MATRIX* A, _OUT MATRIX *R, _OUT INTEGE
         *flag = 0;
 
         // Convert Eigen Matrix to output
-        Eigen::MatrixXd LT = llt.matrixL().transpose();
+        Eigen::MatrixXd LT = llt.matrixU();
         for (i = 0; i < R->rows; i++) {
             for (j = 0; j < R->columns; j++) {
                 *(R->p + i * R->columns + j) = LT(i, j);
@@ -497,6 +507,7 @@ ERROR_ID matrix_cholesky_factor_upper(_IN MATRIX* A, _OUT MATRIX *R, _OUT INTEGE
     }
     else {
         *flag = 1;
+        errorID = _ERROR_CHOLESKY_DECOMPOSITION_FAILED;
     }
 
     return errorID;
@@ -511,7 +522,7 @@ Output: 无
 Input_Output: n行m列矩阵B(即n行m列待求矩阵X)
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID solve_matrix_equation_by_lup_decomposition(_IN MATRIX* A, _IN_OUT MATRIX* B)
+ERROR_ID solve_matrix_equation_by_lup_decomposition(_IN const MATRIX* A, _IN_OUT MATRIX* B)
 {
     INDEX i = 0, j = 0, k = 0, index = 0, s = 0, t = 0;
     INTEGER n = 0, m = 0;

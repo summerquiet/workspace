@@ -18,7 +18,7 @@
 /*******************************************************************************
 * (3)Macro Define Section
 *******************************************************************************/
-
+#define INLLOGE printf
 
 /*******************************************************************************
 * (4)Struct(Data Types) Define Section
@@ -52,7 +52,7 @@ Output: 矩阵C
 Input_Output: 无
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID matrix_add(_IN MATRIX* A, _IN MATRIX* B, _OUT MATRIX* C)
+ERROR_ID matrix_add(_IN const MATRIX* A, _IN const MATRIX* B, _OUT MATRIX* C)
 {
     INDEX i = 0, j = 0;
     INTEGER rows = 0, columns = 0;
@@ -89,7 +89,7 @@ Output: 矩阵C
 Input_Output: 无
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID matrix_subtraction(_IN MATRIX* A, _IN MATRIX* B, _OUT MATRIX* C)
+ERROR_ID matrix_subtraction(_IN const MATRIX* A, _IN const MATRIX* B, _OUT MATRIX* C)
 {
     INDEX i = 0, j = 0;
     INTEGER rows = 0, columns = 0;
@@ -102,6 +102,7 @@ ERROR_ID matrix_subtraction(_IN MATRIX* A, _IN MATRIX* B, _OUT MATRIX* C)
 
     if (A->rows != B->rows || A->rows != C->rows || B->rows != C->rows
         || A->columns != B->columns || A->columns != C->columns || B->columns != C->columns) {
+        INLLOGE("matrix_subtraction error A[%d*%d] B[%d*%d] C[%d*%d]\n", A->rows, A->columns, B->rows, B->columns, C->rows, C->columns);
         errorID = _ERROR_MATRIX_ROWS_OR_COLUMNS_NOT_EQUAL;
         return errorID;
     }
@@ -126,7 +127,7 @@ Output: 矩阵C
 Input_Output: 无
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID matrix_multiplication(_IN MATRIX* A, _IN MATRIX* B, _OUT MATRIX* C)
+ERROR_ID matrix_multiplication(_IN const MATRIX* A, _IN const MATRIX* B, _OUT MATRIX* C)
 {
     INDEX i = 0, j = 0, k = 0;
     REAL sum = 0.0;
@@ -165,7 +166,7 @@ Output: 矩阵B
 Input_Output: 无
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID matrix_num_multiplication(_IN REAL num, _IN MATRIX* A, _OUT MATRIX* B)
+ERROR_ID matrix_num_multiplication(_IN REAL num, _IN const MATRIX* A, _OUT MATRIX* B)
 {
     INDEX i = 0, j = 0;
     ERROR_ID errorID = _ERROR_NO_ERROR;
@@ -200,7 +201,7 @@ Output: 矩阵A的逆矩阵
 Input_Output: 无
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID matrix_inverse(_IN MATRIX* A, _OUT MATRIX* invA)
+ERROR_ID matrix_inverse(_IN const MATRIX* A, _OUT MATRIX* invA)
 {
     INDEX i = 0;
     INTEGER n = 0;
@@ -231,6 +232,9 @@ ERROR_ID matrix_inverse(_IN MATRIX* A, _OUT MATRIX* invA)
     }
 
     errorID = solve_matrix_equation_by_lup_decomposition(ATemp, invA);
+    if (errorID == _ERROR_MATRIX_EQUATION_HAS_NO_SOLUTIONS) {
+        errorID = _ERROR_MATRIX_INVERSE_FAILED;
+    }
 
 EXIT:
     free_stack(&S);
@@ -246,7 +250,7 @@ Output: 矩阵A的转置
 Input_Output: 无
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID matrix_transpose(_IN MATRIX* A, _OUT MATRIX* transposeA)
+ERROR_ID matrix_transpose(_IN const MATRIX* A, _OUT MATRIX* transposeA)
 {
     INDEX i = 0, j = 0;
     ERROR_ID errorID = _ERROR_NO_ERROR;
@@ -279,7 +283,7 @@ Output: 矩阵A的迹
 Input_Output: 无
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID matrix_trace(_IN MATRIX* A, _OUT REAL *trace)
+ERROR_ID matrix_trace(_IN const MATRIX* A, _OUT REAL *trace)
 {
     INDEX i = 0;
     ERROR_ID errorID = _ERROR_NO_ERROR;
@@ -311,12 +315,11 @@ Output: 矩阵A的Frobenius-范数
 Input_Output: 无
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID matrix_norm(_IN MATRIX* A, _OUT REAL* norm)
+ERROR_ID matrix_norm(_IN const MATRIX* A, _OUT REAL* norm)
 {
     INDEX i = 0, j = 0;
     MATRIX* AT = NULL, *ATA = NULL;
     ERROR_ID errorID = _ERROR_NO_ERROR;
-    STACKS S;
     REAL sum = 0.0;
     INTEGER found_tr = 0;
 
@@ -346,7 +349,7 @@ Input_Output: 无
 Return: 错误号
 参考：https://zhuanlan.zhihu.com/p/84210687
 ***********************************************************************************************/
-ERROR_ID lup_decomposition(_IN MATRIX* A, _OUT MATRIX* L, _OUT MATRIX* U, _OUT MATRIX* P)
+ERROR_ID lup_decomposition(_IN const MATRIX* A, _OUT MATRIX* L, _OUT MATRIX* U, _OUT MATRIX* P)
 {
     INDEX i = 0, j = 0, k = 0, index = 0, s = 0, t = 0;
     INTEGER n = 0;
@@ -440,7 +443,7 @@ Input_Output: 无
 Return: 错误号
 参考：武汉大学github分享代码
 ***********************************************************************************************/
-ERROR_ID matrix_cholesky_factor_upper(_IN MATRIX* A, _OUT MATRIX *R, _OUT INTEGER *flag)
+ERROR_ID matrix_cholesky_factor_upper(_IN const MATRIX* A, _OUT MATRIX *R, _OUT INTEGER *flag)
 {
     INDEX n = 0, i = 0, j = 0, k = 0;
     REAL sum2 = 0.0;
@@ -451,16 +454,19 @@ ERROR_ID matrix_cholesky_factor_upper(_IN MATRIX* A, _OUT MATRIX *R, _OUT INTEGE
     // check input
     if (A == NULL || R == NULL || flag == NULL) {
         errorID = _ERROR_INPUT_PARAMETERS_ERROR;
+        printf("C matrix_cholesky_factor_upper par NULL\n");
         return errorID;
     }
 
     if (A->rows != A->columns) {
         errorID = _ERROR_MATRIX_MUST_BE_SQUARE;
+        printf("C matrix_cholesky_factor_upper error 1 A[%d*%d] R[%d*%d]\n", A->rows, A->columns, R->rows, R->columns);
         return errorID;
     }
 
     if (A->rows != R->rows
         || A->columns != R->columns) {
+        printf("C matrix_cholesky_factor_upper error 2 A[%d*%d] R[%d*%d]\n", A->rows, A->columns, R->rows, R->columns);
         errorID = _ERROR_MATRIX_ROWS_OR_COLUMNS_NOT_EQUAL;
         return errorID;
     }
@@ -472,6 +478,7 @@ ERROR_ID matrix_cholesky_factor_upper(_IN MATRIX* A, _OUT MATRIX *R, _OUT INTEGE
 
     L = creat_matrix(R->rows, R->columns, &errorID, &S);
     if (errorID != _ERROR_NO_ERROR) {
+        printf("C matrix_cholesky_factor_upper error 3 A[%d*%d] R[%d*%d]\n", A->rows, A->columns, R->rows, R->columns);
         goto EXIT;
     }
 
@@ -528,7 +535,7 @@ Output: 无
 Input_Output: n行m列矩阵B(即n行m列待求矩阵X)
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID solve_matrix_equation_by_lup_decomposition(_IN MATRIX* A, _IN_OUT MATRIX* B)
+ERROR_ID solve_matrix_equation_by_lup_decomposition(_IN const MATRIX* A, _IN_OUT MATRIX* B)
 {
     INDEX i = 0, j = 0, k = 0, index = 0, s = 0, t = 0;
     INTEGER n = 0, m = 0;

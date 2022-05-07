@@ -14,10 +14,11 @@
 *******************************************************************************/
 #include "inl_matrix.h"
 
+
 /*******************************************************************************
 * (3)Macro Define Section
 *******************************************************************************/
-
+#define INLLOGE printf
 
 /*******************************************************************************
 * (4)Struct(Data Types) Define Section
@@ -43,15 +44,16 @@
 * (8)Function Define Section
 *******************************************************************************/
 
-VOID print_matrix(MATRIX* a, STRING string)
+VOID print_matrix(const MATRIX* a, STRING string)
 {
     INDEX i = 0, j = 0;
     printf("matrix %s:", string);
     printf("\n");
     for (i = 0; i < a->rows; i++) {
         for (j = 0; j < a->columns; j++) {
-            printf("%f  ", a->p[i * a->columns + j]);
+            printf("%.10f  ", a->p[i * a->columns + j]);
         }
+
         printf("\n");
     }
 
@@ -73,12 +75,14 @@ MATRIX* creat_matrix(_IN INTEGER rows, _IN INTEGER columns, _OUT ERROR_ID* error
     MATRIX_ELEMENT_NODE* matrixElementNode = NULL;
 
     if (errorID == NULL) {
+        INLLOGE("creat_matrix errorID error\n");
         return NULL;
     }
 
     *errorID = _ERROR_NO_ERROR;
     if (rows <= 0 || columns <= 0 || S == NULL) {
         *errorID = _ERROR_INPUT_PARAMETERS_ERROR;
+        INLLOGE("creat_matrix  error [%d][%d]\n", rows, columns);
         return NULL;
     }
 
@@ -92,7 +96,7 @@ MATRIX* creat_matrix(_IN INTEGER rows, _IN INTEGER columns, _OUT ERROR_ID* error
         matrixNode = NULL;
         free(matrixElementNode);
         matrixElementNode = NULL;
-
+        INLLOGE("creat_matrix par error\n");
         *errorID = _ERROR_FAILED_TO_ALLOCATE_HEAP_MEMORY;
         return NULL;
     }
@@ -109,7 +113,7 @@ MATRIX* creat_matrix(_IN INTEGER rows, _IN INTEGER columns, _OUT ERROR_ID* error
         matrixNode = NULL;
         free(matrixElementNode);
         matrixElementNode = NULL;
-
+        INLLOGE("creat_matrix matrix->p NULL\n");
         *errorID = _ERROR_FAILED_TO_ALLOCATE_HEAP_MEMORY;
         return NULL;
     }
@@ -197,12 +201,14 @@ MATRIX* creat_zero_matrix(_IN INTEGER rows, _IN INTEGER columns, _OUT ERROR_ID* 
     MATRIX* matrix = NULL;
 
     if (errorID == NULL) {
+        INLLOGE("creat_zero_matrix par error\n");
         return NULL;
     }
 
     *errorID = _ERROR_NO_ERROR;
     if (rows <= 0 || columns <= 0 || S == NULL) {
         *errorID = _ERROR_INPUT_PARAMETERS_ERROR;
+        INLLOGE("creat_zero_matrix error [%d][%d]\n", rows, columns);
         return NULL;
     }
 
@@ -229,12 +235,14 @@ MATRIX* creat_eye_matrix(_IN INTEGER n, _OUT ERROR_ID* errorID, _OUT STACKS* S)
     MATRIX* matrix = NULL;
 
     if (errorID == NULL) {
+        INLLOGE("creat_eye_matrix par error\n");
         return NULL;
     }
 
     *errorID = _ERROR_NO_ERROR;
     if (n <= 0 || S == NULL) {
         *errorID = _ERROR_INPUT_PARAMETERS_ERROR;
+        INLLOGE("creat_eye_matrix S == NULL error\n");
         return NULL;
     }
 
@@ -257,7 +265,7 @@ Input: 矩阵A
 Output：矩阵B
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID matrix_assign(_IN MATRIX* A, _OUT MATRIX* B)
+ERROR_ID matrix_assign(_IN const MATRIX* A, _OUT MATRIX* B)
 {
     ERROR_ID errorID = _ERROR_NO_ERROR;
 
@@ -285,17 +293,19 @@ Input: 赋值用array，赋值用array count
 Input_Output: 矩阵matrix
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID set_matrix_by_array(_IN_OUT MATRIX* matrix, _IN REAL array[], _IN INDEX array_count)
+ERROR_ID set_matrix_by_array(_IN_OUT MATRIX* matrix, _IN const REAL array[], _IN INDEX array_count)
 {
     INDEX i = 0, j = 0;
     ERROR_ID errorID = _ERROR_NO_ERROR;
 
     if (matrix == NULL || array == NULL) {
+        INLLOGE("set_matrix_by_array matrix == NULL error\n");
         return _ERROR_INPUT_PARAMETERS_ERROR;
     }
 
     if (array_count != matrix->rows * matrix->columns) {
-        return _ERROR_INPUT_PARAMETERS_ERROR;
+        INLLOGE("set_matrix_by_array error[%d][%d]\n", matrix->rows, matrix->columns);
+        return _ERROR_MATRIX_ROWS_OR_COLUMNS_NOT_EQUAL;
     }
 
     // Copy data
@@ -312,16 +322,18 @@ Input: 矩阵matrix，矩阵的行row，矩阵的列colum
 Output：矩阵中的某个元素
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID get_matrix_item(_IN MATRIX* matrix, _IN INDEX row, _IN INDEX column, _OUT REAL* value)
+ERROR_ID get_matrix_item(_IN const MATRIX* matrix, _IN INDEX row, _IN INDEX column, _OUT REAL* value)
 {
     ERROR_ID errorID = _ERROR_NO_ERROR;
 
     if (matrix == NULL || value == NULL) {
         errorID = _ERROR_INPUT_PARAMETERS_ERROR;
+        INLLOGE("get_matrix_item matrix == NULL error\n");
         return errorID;
     }
 
     if (row >= matrix->rows || column >= matrix->columns) {
+        INLLOGE("get_matrix_item matrix->rows [%d][%d] error\n", matrix->rows, matrix->columns);
         errorID = _ERROR_INPUT_PARAMETERS_ERROR;
         return errorID;
     }
@@ -339,15 +351,17 @@ Input: 矩阵matrix
 Output：矩阵中的所有元素
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID get_matrix_items(_IN MATRIX* matrix, _IN_OUT REAL array[], _IN INDEX array_count)
+ERROR_ID get_matrix_items(_IN const MATRIX* matrix, _IN_OUT REAL array[], _IN INDEX array_count)
 {
     ERROR_ID errorID = _ERROR_NO_ERROR;
 
     if (matrix == NULL || array == NULL) {
+        INLLOGE("get_matrix_items matrix == NULL error\n");
         return _ERROR_INPUT_PARAMETERS_ERROR;
     }
 
     if (matrix->rows * matrix->columns < array_count) {
+        INLLOGE("get_matrix_items matrix->rows [%d][%d] error\n", matrix->rows, matrix->columns);
         return _ERROR_INPUT_PARAMETERS_ERROR;
     }
 

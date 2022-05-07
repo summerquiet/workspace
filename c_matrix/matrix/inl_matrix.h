@@ -37,7 +37,7 @@ extern "C" {
 *******************************************************************************/
 
 // Implement in inl_matrix.c
-void print_matrix(MATRIX* a, STRING string);
+void print_matrix(const MATRIX* a, STRING string);
 
 /**********************************************************************************************
 Function: creat_matrix
@@ -90,7 +90,7 @@ Input: 矩阵A
 Output：矩阵B
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID matrix_assign(_IN MATRIX* A, _OUT MATRIX* B);
+ERROR_ID matrix_assign(_IN const MATRIX* A, _OUT MATRIX* B);
 
 
 /**********************************************************************************************
@@ -100,7 +100,7 @@ Input: 赋值用array，赋值用array count
 Input_Output: 矩阵matrix
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID set_matrix_by_array(_IN_OUT MATRIX* matrix, _IN REAL array[], _IN INDEX array_count);
+ERROR_ID set_matrix_by_array(_IN_OUT MATRIX* matrix, _IN const REAL array[], _IN INDEX array_count);
 
 
 /**********************************************************************************************
@@ -110,7 +110,7 @@ Input: 矩阵matrix，矩阵的行row，矩阵的列column
 Output：矩阵中的某个元素
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID get_matrix_item(_IN MATRIX* matrix, _IN INDEX row, _IN INDEX column, _OUT REAL* value);
+ERROR_ID get_matrix_item(_IN const MATRIX* matrix, _IN INDEX row, _IN INDEX column, _OUT REAL* value);
 
 /**********************************************************************************************
 Function: get_matrix_items
@@ -119,7 +119,7 @@ Input: 矩阵matrix，矩阵的行row，矩阵的列column
 Output：矩阵中的所有元素
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID get_matrix_items(_IN MATRIX* matrix, _IN_OUT REAL array[], _IN INDEX array_count);
+ERROR_ID get_matrix_items(_IN const MATRIX* matrix, _IN_OUT REAL array[], _IN INDEX array_count);
 
 
 // Implement in inl_matrix_calc_c.c or inl_matrix_calc_eigen.cpp
@@ -131,7 +131,7 @@ Output: 矩阵C
 Input_Output: 无
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID matrix_add(_IN MATRIX* A, _IN MATRIX* B, _OUT MATRIX *C);
+ERROR_ID matrix_add(_IN const MATRIX* A, _IN const MATRIX* B, _OUT MATRIX *C);
 
 
 /**********************************************************************************************
@@ -142,7 +142,7 @@ Output: 矩阵C
 Input_Output: 无
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID matrix_subtraction(_IN MATRIX* A, _IN MATRIX* B, _OUT MATRIX* C);
+ERROR_ID matrix_subtraction(_IN const MATRIX* A, _IN const MATRIX* B, _OUT MATRIX* C);
 
 
 /**********************************************************************************************
@@ -153,7 +153,7 @@ Output: 矩阵C
 Input_Output: 无
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID matrix_multiplication(_IN MATRIX* A, _IN MATRIX* B, _OUT MATRIX* C);
+ERROR_ID matrix_multiplication(_IN const MATRIX* A, _IN const MATRIX* B, _OUT MATRIX* C);
 
 
 /**********************************************************************************************
@@ -164,7 +164,7 @@ Output: 矩阵B
 Input_Output: 无
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID matrix_num_multiplication(_IN REAL num, _IN MATRIX* A, _OUT MATRIX* B);
+ERROR_ID matrix_num_multiplication(_IN REAL num, _IN const MATRIX* A, _OUT MATRIX* B);
 
 
 /**********************************************************************************************
@@ -175,7 +175,7 @@ Output: 矩阵A的逆矩阵
 Input_Output: 无
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID matrix_inverse(_IN MATRIX* A, _OUT MATRIX* invA);
+ERROR_ID matrix_inverse(_IN const MATRIX* A, _OUT MATRIX* invA);
 
 
 /**********************************************************************************************
@@ -186,7 +186,7 @@ Output: 矩阵A的转置
 Input_Output: 无
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID matrix_transpose(_IN MATRIX* A, _OUT MATRIX* transposeA);
+ERROR_ID matrix_transpose(_IN const MATRIX* A, _OUT MATRIX* transposeA);
 
 
 /**********************************************************************************************
@@ -197,7 +197,7 @@ Output: 矩阵A的迹
 Input_Output: 无
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID matrix_trace(_IN MATRIX* A, _OUT REAL* trace);
+ERROR_ID matrix_trace(_IN const MATRIX* A, _OUT REAL* trace);
 
 
 /**********************************************************************************************
@@ -208,7 +208,7 @@ Output: 矩阵A的Frobenius-范数
 Input_Output: 无
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID matrix_norm(_IN MATRIX* A, _OUT REAL* norm);
+ERROR_ID matrix_norm(_IN const MATRIX* A, _OUT REAL* norm);
 
 
 /**********************************************************************************************
@@ -220,7 +220,7 @@ Input_Output: 无
 Return: 错误号
 参考：https://zhuanlan.zhihu.com/p/84210687
 ***********************************************************************************************/
-ERROR_ID lup_decomposition(_IN MATRIX* A, _OUT MATRIX* L, _OUT MATRIX* U, _OUT MATRIX* P);
+ERROR_ID lup_decomposition(_IN const MATRIX* A, _OUT MATRIX* L, _OUT MATRIX* U, _OUT MATRIX* P);
 
 
 /**********************************************************************************************
@@ -234,7 +234,7 @@ Input_Output: 无
 Return: 错误号
 参考：武汉大学github分享代码
 ***********************************************************************************************/
-ERROR_ID matrix_cholesky_factor_upper(_IN MATRIX* A, _OUT MATRIX *R, _OUT INTEGER *flag);
+ERROR_ID matrix_cholesky_factor_upper(_IN const MATRIX* A, _OUT MATRIX *R, _OUT INTEGER *flag);
 
 
 /**********************************************************************************************
@@ -245,7 +245,7 @@ Output: 无
 Input_Output: n行m列矩阵B(即n行m列待求矩阵X)
 Return: 错误号
 ***********************************************************************************************/
-ERROR_ID solve_matrix_equation_by_lup_decomposition(_IN MATRIX* A, _IN_OUT MATRIX* B);
+ERROR_ID solve_matrix_equation_by_lup_decomposition(_IN const MATRIX* A, _IN_OUT MATRIX* B);
 
 #ifdef __cplusplus
 }
