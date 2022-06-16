@@ -18,7 +18,7 @@
 /*******************************************************************************
 * (3)Macro Define Section
 *******************************************************************************/
-#define INLLOGE printf
+
 
 /*******************************************************************************
 * (4)Struct(Data Types) Define Section
@@ -55,7 +55,6 @@ Return: 错误号
 ERROR_ID matrix_add(_IN const MATRIX* A, _IN const MATRIX* B, _OUT MATRIX* C)
 {
     INDEX i = 0, j = 0;
-    INTEGER rows = 0, columns = 0;
     ERROR_ID errorID = _ERROR_NO_ERROR;
 
     if (A == NULL || B == NULL || C == NULL) {
@@ -69,11 +68,10 @@ ERROR_ID matrix_add(_IN const MATRIX* A, _IN const MATRIX* B, _OUT MATRIX* C)
         return errorID;
     }
 
-    rows = A->rows;
-    columns = A->columns;
-    for (i = 0; i < rows; i++) {
-        for (j = 0; j < columns; j++) {
-            C->p[i * columns + j] = A->p[i * columns + j] + B->p[i * columns + j];
+    // Calc
+    for (i = 0; i < A->rows; i++) {
+        for (j = 0; j < A->columns; j++) {
+            C->p[i * A->columns + j] = A->p[i * A->columns + j] + B->p[i * A->columns + j];
         }
     }
 
@@ -92,7 +90,6 @@ Return: 错误号
 ERROR_ID matrix_subtraction(_IN const MATRIX* A, _IN const MATRIX* B, _OUT MATRIX* C)
 {
     INDEX i = 0, j = 0;
-    INTEGER rows = 0, columns = 0;
     ERROR_ID errorID = _ERROR_NO_ERROR;
 
     if (A == NULL || B == NULL || C == NULL) {
@@ -102,16 +99,15 @@ ERROR_ID matrix_subtraction(_IN const MATRIX* A, _IN const MATRIX* B, _OUT MATRI
 
     if (A->rows != B->rows || A->rows != C->rows || B->rows != C->rows
         || A->columns != B->columns || A->columns != C->columns || B->columns != C->columns) {
-        INLLOGE("matrix_subtraction error A[%d*%d] B[%d*%d] C[%d*%d]\n", A->rows, A->columns, B->rows, B->columns, C->rows, C->columns);
+        INLLOGE("matrix_subtraction error A[%d*%d] B[%d*%d] C[%d*%d]", A->rows, A->columns, B->rows, B->columns, C->rows, C->columns);
         errorID = _ERROR_MATRIX_ROWS_OR_COLUMNS_NOT_EQUAL;
         return errorID;
     }
 
-    rows = A->rows;
-    columns = A->columns;
-    for (i = 0; i < rows; i++) {
-        for (j = 0; j < columns; j++) {
-            C->p[i * columns + j] = A->p[i * columns + j] - B->p[i * columns + j];
+    // Calc
+    for (i = 0; i < A->rows; i++) {
+        for (j = 0; j < A->columns; j++) {
+            C->p[i * A->columns + j] = A->p[i * A->columns + j] - B->p[i * A->columns + j];
         }
     }
 
@@ -143,15 +139,49 @@ ERROR_ID matrix_multiplication(_IN const MATRIX* A, _IN const MATRIX* B, _OUT MA
         return errorID;
     }
 
-    for (i = 0; i < A->rows; i++) {
-        for (j = 0; j < B->columns; j++) {
-            sum = 0.0;
-            for (k = 0; k < A->columns; k++) {
-                sum += A->p[i * A->columns + k] * B->p[k * B->columns + j];
-            }
+    // Check input and output working space
+    if (A != C && B != C) {
+        // Calc
+        for (i = 0; i < A->rows; i++) {
+            for (j = 0; j < B->columns; j++) {
+                sum = 0.0;
+                for (k = 0; k < A->columns; k++) {
+                    sum += A->p[i * A->columns + k] * B->p[k * B->columns + j];
+                }
 
-            C->p[i * B->columns + j] = sum;
+                C->p[i * B->columns + j] = sum;
+            }
         }
+    }
+    else {
+        MATRIX* CTemp = NULL;
+        STACKS S;
+        init_stack(&S);
+
+        // Matrix multiplicaiton need a template space for
+        // A = A * B call matrix_multiplication(A, B, A);
+        CTemp = creat_matrix(C->rows, C->columns, &errorID, &S);
+        if (errorID != _ERROR_NO_ERROR) {
+            goto EXIT;
+        }
+
+        // Calc
+        for (i = 0; i < A->rows; i++) {
+            for (j = 0; j < B->columns; j++) {
+                sum = 0.0;
+                for (k = 0; k < A->columns; k++) {
+                    sum += A->p[i * A->columns + k] * B->p[k * B->columns + j];
+                }
+
+                CTemp->p[i * B->columns + j] = sum;
+            }
+        }
+
+        // Output
+        memcpy(C->p, CTemp->p, C->rows * C->columns * sizeof(REAL));
+
+EXIT:
+        free_stack(&S);
     }
 
     return errorID;
@@ -182,10 +212,10 @@ ERROR_ID matrix_num_multiplication(_IN REAL num, _IN const MATRIX* A, _OUT MATRI
         return errorID;
     }
 
-    // Calculation
+    // Calc
     for (i = 0; i < B->rows; i++) {
         for (j = 0; j < B->columns; j++) {
-            *(B->p + i * B->columns + j) = *(A->p + i * A->columns + j) * num;
+            B->p[i * B->columns + j] = A->p[i * A->columns + j] * num;
         }
     }
 
@@ -205,9 +235,7 @@ ERROR_ID matrix_inverse(_IN const MATRIX* A, _OUT MATRIX* invA)
 {
     INDEX i = 0;
     INTEGER n = 0;
-    MATRIX* ATemp = NULL;
     ERROR_ID errorID = _ERROR_NO_ERROR;
-    STACKS S;
 
     if (A == NULL || invA == NULL) {
         errorID = _ERROR_INPUT_PARAMETERS_ERROR;
@@ -219,25 +247,17 @@ ERROR_ID matrix_inverse(_IN const MATRIX* A, _OUT MATRIX* invA)
         return errorID;
     }
 
-    init_stack(&S);
-
     n = A->rows;
-    ATemp = creat_matrix(n, n, &errorID, &S);
-    if (errorID != _ERROR_NO_ERROR) goto EXIT;
-
-    memcpy(ATemp->p, A->p, n * n * sizeof(REAL));
     memset(invA->p, 0, n * n * sizeof(REAL));
     for (i = 0; i < n; i++) {
         invA->p[i * n + i] = 1.0;
     }
 
-    errorID = solve_matrix_equation_by_lup_decomposition(ATemp, invA);
+    errorID = solve_matrix_equation_by_lup_decomposition(A, invA);
     if (errorID == _ERROR_MATRIX_EQUATION_HAS_NO_SOLUTIONS) {
         errorID = _ERROR_MATRIX_INVERSE_FAILED;
     }
 
-EXIT:
-    free_stack(&S);
     return errorID;
 }
 
@@ -253,7 +273,7 @@ Return: 错误号
 ERROR_ID matrix_transpose(_IN const MATRIX* A, _OUT MATRIX* transposeA)
 {
     INDEX i = 0, j = 0;
-    ERROR_ID errorID = _ERROR_NO_ERROR;
+    ERROR_ID errorID = _ERROR_NO_ERROR; 
 
     if (A == NULL || transposeA == NULL) {
         errorID = _ERROR_INPUT_PARAMETERS_ERROR;
@@ -265,10 +285,39 @@ ERROR_ID matrix_transpose(_IN const MATRIX* A, _OUT MATRIX* transposeA)
         return errorID;
     }
 
-    for (i = 0; i < A->rows; i++) {
-        for (j = 0; j < A->columns; j++) {
-            transposeA->p[j * A->rows + i] = A->p[i * A->columns + j];
+    // Check input and output working space
+    if (A != transposeA) {
+        // Calc
+        for (i = 0; i < A->rows; i++) {
+            for (j = 0; j < A->columns; j++) {
+                transposeA->p[j * A->rows + i] = A->p[i * A->columns + j];
+            }
         }
+    }
+    else {
+        MATRIX* AT = NULL;
+        STACKS S;
+        init_stack(&S);
+
+        // Matrix transpose need a template space for
+        // A = AT call matrix_transpose(A, A)
+        AT = creat_matrix(transposeA->rows, transposeA->columns, &errorID, &S);
+        if (errorID != _ERROR_NO_ERROR) {
+            goto EXIT;
+        }
+
+        // Calc
+        for (i = 0; i < A->rows; i++) {
+            for (j = 0; j < A->columns; j++) {
+                AT->p[j * A->rows + i] = A->p[i * A->columns + j];
+            }
+        }
+
+        // Output
+        memcpy(transposeA->p, AT->p, transposeA->rows * transposeA->columns * sizeof(REAL));
+
+EXIT:
+        free_stack(&S);
     }
 
     return errorID;
@@ -298,6 +347,7 @@ ERROR_ID matrix_trace(_IN const MATRIX* A, _OUT REAL *trace)
         return errorID;
     }
 
+    // Calc
     *trace = 0.0;
     for (i = 0; i < A->rows; i++) {
         *trace += A->p[i * A->columns + i];
@@ -363,6 +413,11 @@ ERROR_ID lup_decomposition(_IN const MATRIX* A, _OUT MATRIX* L, _OUT MATRIX* U, 
 
     if (A->rows != A->columns) {
         errorID = _ERROR_MATRIX_MUST_BE_SQUARE;
+        return errorID;
+    }
+
+    if (A == L || A == U || A == P) {
+        errorID = _ERROR_INPUT_PARAMETERS_ERROR;
         return errorID;
     }
 
@@ -454,19 +509,19 @@ ERROR_ID matrix_cholesky_factor_upper(_IN const MATRIX* A, _OUT MATRIX *R, _OUT 
     // check input
     if (A == NULL || R == NULL || flag == NULL) {
         errorID = _ERROR_INPUT_PARAMETERS_ERROR;
-        printf("C matrix_cholesky_factor_upper par NULL\n");
+        INLLOGE("C matrix_cholesky_factor_upper par NULL");
         return errorID;
     }
 
     if (A->rows != A->columns) {
         errorID = _ERROR_MATRIX_MUST_BE_SQUARE;
-        printf("C matrix_cholesky_factor_upper error 1 A[%d*%d] R[%d*%d]\n", A->rows, A->columns, R->rows, R->columns);
+        INLLOGE("C matrix_cholesky_factor_upper error 1 A[%d*%d] R[%d*%d]", A->rows, A->columns, R->rows, R->columns);
         return errorID;
     }
 
     if (A->rows != R->rows
         || A->columns != R->columns) {
-        printf("C matrix_cholesky_factor_upper error 2 A[%d*%d] R[%d*%d]\n", A->rows, A->columns, R->rows, R->columns);
+        INLLOGE("C matrix_cholesky_factor_upper error 2 A[%d*%d] R[%d*%d]", A->rows, A->columns, R->rows, R->columns);
         errorID = _ERROR_MATRIX_ROWS_OR_COLUMNS_NOT_EQUAL;
         return errorID;
     }
@@ -478,7 +533,7 @@ ERROR_ID matrix_cholesky_factor_upper(_IN const MATRIX* A, _OUT MATRIX *R, _OUT 
 
     L = creat_matrix(R->rows, R->columns, &errorID, &S);
     if (errorID != _ERROR_NO_ERROR) {
-        printf("C matrix_cholesky_factor_upper error 3 A[%d*%d] R[%d*%d]\n", A->rows, A->columns, R->rows, R->columns);
+        INLLOGE("C matrix_cholesky_factor_upper error 3 A[%d*%d] R[%d*%d]", A->rows, A->columns, R->rows, R->columns);
         goto EXIT;
     }
 
@@ -652,12 +707,14 @@ ERROR_ID solve_matrix_equation_by_lup_decomposition(_IN const MATRIX* A, _IN_OUT
             for (k = i + 1; k < n; k++) {
                 sum += U->p[i * n + k] * B->p[k * m + j];
             }
+
             B->p[i * m + j] = (y->p[i * m + j] - sum) / U->p[i * n + i];
         }
     }
 
 EXIT:
     free_stack(&S);
+
     return errorID;
 }
 

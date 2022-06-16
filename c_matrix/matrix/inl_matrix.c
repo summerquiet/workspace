@@ -18,7 +18,7 @@
 /*******************************************************************************
 * (3)Macro Define Section
 *******************************************************************************/
-#define INLLOGE printf
+
 
 /*******************************************************************************
 * (4)Struct(Data Types) Define Section
@@ -47,17 +47,17 @@
 VOID print_matrix(const MATRIX* a, STRING string)
 {
     INDEX i = 0, j = 0;
-    printf("matrix %s:", string);
-    printf("\n");
+    INLLOGE("matrix %s:", string);
+    INLLOGE("\n");
     for (i = 0; i < a->rows; i++) {
         for (j = 0; j < a->columns; j++) {
-            printf("%.10f  ", a->p[i * a->columns + j]);
+            INLLOGE("%.10f  ", a->p[i * a->columns + j]);
         }
 
-        printf("\n");
+        INLLOGE("\n");
     }
 
-    printf("\n");
+    INLLOGE("\n");
 }
 
 /**********************************************************************************************
@@ -75,14 +75,14 @@ MATRIX* creat_matrix(_IN INTEGER rows, _IN INTEGER columns, _OUT ERROR_ID* error
     MATRIX_ELEMENT_NODE* matrixElementNode = NULL;
 
     if (errorID == NULL) {
-        INLLOGE("creat_matrix errorID error\n");
+        INLLOGE("creat_matrix errorID error");
         return NULL;
     }
 
     *errorID = _ERROR_NO_ERROR;
     if (rows <= 0 || columns <= 0 || S == NULL) {
         *errorID = _ERROR_INPUT_PARAMETERS_ERROR;
-        INLLOGE("creat_matrix  error [%d][%d]\n", rows, columns);
+        INLLOGE("creat_matrix  error [%d][%d]", rows, columns);
         return NULL;
     }
 
@@ -96,7 +96,7 @@ MATRIX* creat_matrix(_IN INTEGER rows, _IN INTEGER columns, _OUT ERROR_ID* error
         matrixNode = NULL;
         free(matrixElementNode);
         matrixElementNode = NULL;
-        INLLOGE("creat_matrix par error\n");
+        INLLOGE("creat_matrix par error");
         *errorID = _ERROR_FAILED_TO_ALLOCATE_HEAP_MEMORY;
         return NULL;
     }
@@ -113,7 +113,7 @@ MATRIX* creat_matrix(_IN INTEGER rows, _IN INTEGER columns, _OUT ERROR_ID* error
         matrixNode = NULL;
         free(matrixElementNode);
         matrixElementNode = NULL;
-        INLLOGE("creat_matrix matrix->p NULL\n");
+        INLLOGE("creat_matrix matrix->p NULL");
         *errorID = _ERROR_FAILED_TO_ALLOCATE_HEAP_MEMORY;
         return NULL;
     }
@@ -201,14 +201,14 @@ MATRIX* creat_zero_matrix(_IN INTEGER rows, _IN INTEGER columns, _OUT ERROR_ID* 
     MATRIX* matrix = NULL;
 
     if (errorID == NULL) {
-        INLLOGE("creat_zero_matrix par error\n");
+        INLLOGE("creat_zero_matrix par error");
         return NULL;
     }
 
     *errorID = _ERROR_NO_ERROR;
     if (rows <= 0 || columns <= 0 || S == NULL) {
         *errorID = _ERROR_INPUT_PARAMETERS_ERROR;
-        INLLOGE("creat_zero_matrix error [%d][%d]\n", rows, columns);
+        INLLOGE("creat_zero_matrix error [%d][%d]", rows, columns);
         return NULL;
     }
 
@@ -235,14 +235,14 @@ MATRIX* creat_eye_matrix(_IN INTEGER n, _OUT ERROR_ID* errorID, _OUT STACKS* S)
     MATRIX* matrix = NULL;
 
     if (errorID == NULL) {
-        INLLOGE("creat_eye_matrix par error\n");
+        INLLOGE("creat_eye_matrix par error");
         return NULL;
     }
 
     *errorID = _ERROR_NO_ERROR;
     if (n <= 0 || S == NULL) {
         *errorID = _ERROR_INPUT_PARAMETERS_ERROR;
-        INLLOGE("creat_eye_matrix S == NULL error\n");
+        INLLOGE("creat_eye_matrix S == NULL error");
         return NULL;
     }
 
@@ -299,12 +299,12 @@ ERROR_ID set_matrix_by_array(_IN_OUT MATRIX* matrix, _IN const REAL array[], _IN
     ERROR_ID errorID = _ERROR_NO_ERROR;
 
     if (matrix == NULL || array == NULL) {
-        INLLOGE("set_matrix_by_array matrix == NULL error\n");
+        INLLOGE("set_matrix_by_array matrix == NULL error");
         return _ERROR_INPUT_PARAMETERS_ERROR;
     }
 
     if (array_count != matrix->rows * matrix->columns) {
-        INLLOGE("set_matrix_by_array error[%d][%d]\n", matrix->rows, matrix->columns);
+        INLLOGE("set_matrix_by_array error[%d][%d]", matrix->rows, matrix->columns);
         return _ERROR_MATRIX_ROWS_OR_COLUMNS_NOT_EQUAL;
     }
 
@@ -328,12 +328,12 @@ ERROR_ID get_matrix_item(_IN const MATRIX* matrix, _IN INDEX row, _IN INDEX colu
 
     if (matrix == NULL || value == NULL) {
         errorID = _ERROR_INPUT_PARAMETERS_ERROR;
-        INLLOGE("get_matrix_item matrix == NULL error\n");
+        INLLOGE("get_matrix_item matrix == NULL error");
         return errorID;
     }
 
     if (row >= matrix->rows || column >= matrix->columns) {
-        INLLOGE("get_matrix_item matrix->rows [%d][%d] error\n", matrix->rows, matrix->columns);
+        INLLOGE("get_matrix_item matrix->rows [%d][%d] error", matrix->rows, matrix->columns);
         errorID = _ERROR_INPUT_PARAMETERS_ERROR;
         return errorID;
     }
@@ -356,12 +356,12 @@ ERROR_ID get_matrix_items(_IN const MATRIX* matrix, _IN_OUT REAL array[], _IN IN
     ERROR_ID errorID = _ERROR_NO_ERROR;
 
     if (matrix == NULL || array == NULL) {
-        INLLOGE("get_matrix_items matrix == NULL error\n");
+        INLLOGE("get_matrix_items matrix == NULL error");
         return _ERROR_INPUT_PARAMETERS_ERROR;
     }
 
     if (matrix->rows * matrix->columns < array_count) {
-        INLLOGE("get_matrix_items matrix->rows [%d][%d] error\n", matrix->rows, matrix->columns);
+        INLLOGE("get_matrix_items matrix->rows [%d][%d] error", matrix->rows, matrix->columns);
         return _ERROR_INPUT_PARAMETERS_ERROR;
     }
 

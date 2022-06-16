@@ -61,6 +61,7 @@
 #define _ERROR_INPUT_PARAMETERS_ERROR                           0X00010000      //输入参数错误
 #define _ERROR_NO_IMPLEMENT                                     0X10000000      //未实装
 
+#define INLLOGE printf
 
 /*******************************************************************************
 * (4)Struct(Data Types) Define Section

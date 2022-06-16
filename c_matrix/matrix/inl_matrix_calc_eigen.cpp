@@ -14,7 +14,7 @@
 *******************************************************************************/
 #include "inl_matrix.h"
 #include <Eigen/Dense>
-#include <iostream>
+
 
 /*******************************************************************************
 * (3)Macro Define Section
@@ -118,7 +118,7 @@ ERROR_ID matrix_subtraction(_IN const MATRIX* A, _IN const MATRIX* B, _OUT MATRI
 
     if (A->rows != B->rows || A->rows != C->rows || B->rows != C->rows
         || A->columns != B->columns || A->columns != C->columns || B->columns != C->columns) {
-        printf("CPP matrix_subtraction error A[%d*%d] B[%d*%d] C[%d*%d]\n", A->rows, A->columns, B->rows, B->columns, C->rows, C->columns);
+        INLLOGE("CPP matrix_subtraction error A[%d*%d] B[%d*%d] C[%d*%d]\n", A->rows, A->columns, B->rows, B->columns, C->rows, C->columns);
         errorID = _ERROR_MATRIX_ROWS_OR_COLUMNS_NOT_EQUAL;
         return errorID;
     }
@@ -171,7 +171,7 @@ ERROR_ID matrix_multiplication(_IN const MATRIX* A, _IN const MATRIX* B, _OUT MA
     }
 
     if (A->columns != B->rows || A->rows != C->rows || B->columns != C->columns) {
-        printf("CPP matrix_multiplication error A[%d*%d] B[%d*%d] C[%d*%d]\n", A->rows, A->columns, B->rows, B->columns, C->rows, C->columns);
+        INLLOGE("CPP matrix_multiplication error A[%d*%d] B[%d*%d] C[%d*%d]\n", A->rows, A->columns, B->rows, B->columns, C->rows, C->columns);
         errorID = _ERROR_MATRIX_MULTIPLICATION;
         return errorID;
     }
@@ -321,7 +321,7 @@ ERROR_ID matrix_transpose(_IN const MATRIX* A, _OUT MATRIX* transposeA)
     }
 
     if (A->rows != transposeA->columns || A->columns != transposeA->rows) {
-        printf("matrix_transpose [%d*%d]=[%d*%d]\n", A->rows, A->columns, transposeA->rows, transposeA->columns);
+        INLLOGE("matrix_transpose [%d*%d]=[%d*%d]\n", A->rows, A->columns, transposeA->rows, transposeA->columns);
         errorID = _ERROR_MATRIX_TRANSPOSE_FAILED;
         return errorID;
     }

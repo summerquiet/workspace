@@ -29,8 +29,8 @@ include_directories(${PROJECT_HEADERS})
 
 #指定源文件
 file(GLOB PROJECT_SOURCES
-    #"${CMAKE_CURRENT_SOURCE_DIR}/matrix/inl_matrix_calc_c.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/matrix/inl_matrix_calc_eigen.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/matrix/inl_matrix_calc_c.c"
+    #"${CMAKE_CURRENT_SOURCE_DIR}/matrix/inl_matrix_calc_eigen.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/matrix/inl_matrix_common.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/matrix/inl_matrix.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/matrix/test_matrix.c"
