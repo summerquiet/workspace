@@ -1,3 +1,0 @@
-D:/workspace/git/workspace/CMakeProjTest/out/build/x64-Debug/CMakeFiles/CMakeProjTest.dir
-D:/workspace/git/workspace/CMakeProjTest/out/build/x64-Debug/CMakeFiles/edit_cache.dir
-D:/workspace/git/workspace/CMakeProjTest/out/build/x64-Debug/CMakeFiles/rebuild_cache.dir
